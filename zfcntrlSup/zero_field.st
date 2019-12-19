@@ -24,6 +24,7 @@ option +s;
   static const char* const ZF_STAT_PSU_INVALID = "Power supply invalid";
   static const char* const ZF_STAT_PSU_ON_LIMITS = "Power supply on limits";
   static const char* const ZF_STAT_PSU_WRITE_FAILED = "Power supply write failed";
+  static const char* const ZF_STAT_PSU_LIMITS_INCONSISTENT = "PSU high limit<low limit";
   
   static const int PSU_MODE_VOLTAGE = 0;  
   static const int PSU_MODE_CURRENT = 1;  
@@ -43,6 +44,7 @@ option +s;
   static int all_power_suppies_on(struct seqg_vars* const pVar);
   static int all_power_suppies_in_current_mode(struct seqg_vars* const pVar);
   static double coerce_to_range(double value, double low_limit, double high_limit);
+  static int psu_limits_inconsistent(struct seqg_vars* const pVar);
   
   /* A timestamp from the last time we asked the magnetometer to take data. Used for loop time calculation. */
   clock_t _time_of_last_mag_read_trigger;
@@ -255,7 +257,12 @@ ss zero_field
       ZF_TRANSITION_TO_STATE("write_to_psu");
     }
     
-    when() {
+    when(psu_limits_inconsistent(pVar)) {
+      errlogSevPrintf(errlogMajor, "%s: power supply limits are inconsistent - cannot write to power supplies.\n", PROGRAM_NAME);
+      PVPUTSTR(status, ZF_STAT_PSU_LIMITS_INCONSISTENT);
+    } state loop_delay
+    
+    when(!psu_limits_inconsistent(pVar)) {
       double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
       double new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
       double new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
@@ -382,8 +389,8 @@ ss zero_field
    */
   static double coerce_to_range(double value, double low_limit, double high_limit) {
     if (high_limit < low_limit) {
-      errlogSevPrintf(errlogMajor, "%s: coerce_to_range called with high < low. Returning value anyway.", PROGRAM_NAME);
-      return value;
+      errlogSevPrintf(errlogMajor, "%s: coerce_to_range called with high < low. Returning zero.", PROGRAM_NAME);
+      return 0.0;
     }
     
     if (value > high_limit) {
@@ -405,5 +412,11 @@ ss zero_field
       return pVar->output_psu_x_mode == PSU_MODE_CURRENT
           && pVar->output_psu_y_mode == PSU_MODE_CURRENT
           && pVar->output_psu_z_mode == PSU_MODE_CURRENT;
+  }
+  
+  static int psu_limits_inconsistent(struct seqg_vars* const pVar) {
+      return (pVar->output_psu_x_sp_drvh < pVar->output_psu_x_sp_drvl)
+          || (pVar->output_psu_y_sp_drvh < pVar->output_psu_y_sp_drvl)
+          || (pVar->output_psu_z_sp_drvh < pVar->output_psu_z_sp_drvl);
   }
 }%

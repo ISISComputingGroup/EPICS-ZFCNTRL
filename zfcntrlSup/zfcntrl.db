@@ -188,6 +188,8 @@ record(mbbo, "$(P)STATUS") {
   field(FVSV, "MAJOR")
   field(SXST, "Power supply write failed")
   field(SXSV, "INVALID")
+  field(SVST, "PSU high limit<low limit")
+  field(SVSV, "MAJOR")
   
   info(interest, "HIGH")
   info(archive, "VAL SEVR")
