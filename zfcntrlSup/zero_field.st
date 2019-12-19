@@ -86,6 +86,7 @@ ss zero_field
     }
     
     when() {
+      PVPUT(new_readings_available, 0);
       PVPUT(trigger_read, 1);
     } state wait_for_mag_read
   }
@@ -112,11 +113,6 @@ ss zero_field
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading did not become available.\n", PROGRAM_NAME);
       /* After this state go straight to trigger_mag_read rather than wait_before_read as we have already waited 5 seconds */
     } state trigger_mag_read
-    
-    exit {
-      /* Reset new readings back to unavailable no matter how we leave this state. */
-      PVPUT(new_readings_available, 0);
-    }
   }
   
   state check_corrected_field {
