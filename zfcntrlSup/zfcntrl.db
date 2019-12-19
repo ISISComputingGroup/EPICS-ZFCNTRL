@@ -73,7 +73,7 @@ record(mbbo, "$(P)STATEMACHINE:STATE") {
   field(SXST, "check_output_psu_state")
   field(SVST, "write_to_psu")
   field(EIST, "check_psu_writes")
-  field(NIST, "loop_delay")
+  field(NIST, "wait_before_read")
   field(TEST, "ensure_mode_current")
   field(ELST, "wait_for_mode_current")
   field(TVST, "ensure_outputs_on")

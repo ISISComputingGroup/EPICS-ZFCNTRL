@@ -104,13 +104,13 @@ ss zero_field
       PVPUT(stable, 0);
       PVPUTSTR(status, ZF_STAT_MAGNETOMETER_DATA_INVALID);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading became available but severities were invalid.\n", PROGRAM_NAME);
-    } state loop_delay
+    } state wait_before_read
     
     when(delay(read_timeout)) {
       PVPUT(stable, 0);
       PVPUTSTR(status, ZF_STAT_MAGNETOMETER_DATA_STALE);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading did not become available.\n", PROGRAM_NAME);
-      /* After this state go straight to trigger_mag_read rather than loop_delay as we have already waited 5 seconds */
+      /* After this state go straight to trigger_mag_read rather than wait_before_read as we have already waited 5 seconds */
     } state trigger_mag_read
     
     exit {
@@ -148,7 +148,7 @@ ss zero_field
       if (debug) {
         errlogSevPrintf(errlogInfo, "%s: Magnetometer overloaded - skipping PSU writes\n", PROGRAM_NAME);
       }
-    } state loop_delay
+    } state wait_before_read
     
     when(!magnetometer_overloaded) {
       /* Intentionally empty */
@@ -170,7 +170,7 @@ ss zero_field
       if (debug) {
         errlogSevPrintf(errlogMajor, "%s: Auto-feedback disabled - skipping PSU writes\n", PROGRAM_NAME);
       }
-    } state loop_delay
+    } state wait_before_read
   }
   
   state check_output_psu_state {
@@ -181,7 +181,7 @@ ss zero_field
     when(power_supplies_invalid(pVar)) {
       PVPUTSTR(status, ZF_STAT_PSU_INVALID);
       errlogSevPrintf(errlogMajor, "%s: Power supply is in invalid alarm. Not writing to power supplies.\n", PROGRAM_NAME);
-    } state loop_delay
+    } state wait_before_read
     
     when(!power_supplies_invalid(pVar)) {
       /* Intentionally empty */
@@ -260,7 +260,7 @@ ss zero_field
     when(psu_limits_inconsistent(pVar)) {
       errlogSevPrintf(errlogMajor, "%s: power supply limits are inconsistent - cannot write to power supplies.\n", PROGRAM_NAME);
       PVPUTSTR(status, ZF_STAT_PSU_LIMITS_INCONSISTENT);
-    } state loop_delay
+    } state wait_before_read
     
     when(!psu_limits_inconsistent(pVar)) {
       double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
@@ -316,20 +316,20 @@ ss zero_field
         if (debug) {
           errlogSevPrintf(errlogInfo, "%s: power supply writes successful\n", PROGRAM_NAME);
         }
-      } state loop_delay
+      } state wait_before_read
       
       when(delay(read_timeout)) {
         PVPUTSTR(status, ZF_STAT_PSU_WRITE_FAILED);
         errlogSevPrintf(errlogMajor, "%s: Power supply writes failed to get within tolerance. Setpoints = (X=%f, Y=%f, Z=%f), setpoint readbacks = (X=%f, Y=%f, Z=%f). Tolerance=%f\n", 
           PROGRAM_NAME, output_psu_x_sp, output_psu_y_sp, output_psu_z_sp, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv, output_psu_tolerance); 
           
-        /* don't go to loop_delay in this case as we have already waited 5 seconds */
+        /* don't go to wait_before_read in this case as we have already waited 5 seconds */
       } state trigger_mag_read
   }
   
-  state loop_delay {
+  state wait_before_read {
     entry {
-      ZF_TRANSITION_TO_STATE("loop_delay");
+      ZF_TRANSITION_TO_STATE("wait_before_read");
     }
     
     when(delay(loop_delay/1000.0)) { } state trigger_mag_read
