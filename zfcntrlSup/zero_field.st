@@ -70,12 +70,13 @@ ss zero_field
   {
     entry {
       %% epicsTimeStamp new_time;
+      %% double time_taken;
       ZF_TRANSITION_TO_STATE("trigger_mag_read");
       
       /* inverts each time around the main statemachine loop, giving a flashing effect if everything is working correctly. */
       PVPUT(statemachine_activity, !statemachine_activity);
       %% epicsTimeGetCurrent(&new_time);
-      %% double time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_mag_read_trigger);
+      %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_mag_read_trigger);
       PVPUT(statemachine_measured_loop_time, time_taken);
       
       if (debug) {
