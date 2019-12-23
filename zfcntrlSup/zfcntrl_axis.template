@@ -1,7 +1,7 @@
 # Field setpoints/readbacks - axis $(AXIS)
 
 record(ai, "$(P)FIELD:$(AXIS):_RAW") {
-  field(INP, "$(MAGNETOMETER):$(AXIS):CORRECTEDFIELD CA MSS")
+  field(INP, "$(MAGNETOMETER):CORRECTEDFIELD:$(AXIS) CA MSS")
   field(EGU, "mG")
   field(PREC, "6")
   
@@ -23,7 +23,7 @@ record(calc, "$(P)FIELD:$(AXIS)") {
 
 
 record(ai, "$(P)FIELD:$(AXIS):MEAS:_RAW") {
-  field(INP, "$(MAGNETOMETER):$(AXIS):APPLYOFFSET CA MSS")
+  field(INP, "$(MAGNETOMETER):MEASURED:$(AXIS) CA MSS")
   field(EGU, "mG")
   field(PREC, "6")
   
