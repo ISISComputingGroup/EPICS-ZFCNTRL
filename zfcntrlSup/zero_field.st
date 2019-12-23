@@ -3,7 +3,7 @@ program zero_field("P")
 #include "seqPVmacros.h"
 #include "zf_pv_definitions.h"
 %% #include "seq_snc.h"
-%% #include "time.h"
+%% #include "epicsTime.h"
 %% #include "string.h"
 %% #include "errlog.h"
 %% #include "alarm.h"
@@ -47,7 +47,7 @@ option +s;
   static int psu_limits_inconsistent(struct seqg_vars* const pVar);
   
   /* A timestamp from the last time we asked the magnetometer to take data. Used for loop time calculation. */
-  clock_t _time_of_last_mag_read_trigger;
+  epicsTimeStamp _time_of_last_mag_read_trigger;
   
   /* flag to track whether power supply outputs were limited or not. Need this flag to be able to set correct errors. */
   int _output_on_limit = 0;
@@ -61,7 +61,7 @@ ss zero_field
   {
     entry {
       ZF_TRANSITION_TO_STATE("initializing");
-      _time_of_last_mag_read_trigger = clock();
+      %% epicsTimeGetCurrent(&_time_of_last_mag_read_trigger);
     }
     when (){} state trigger_mag_read
   }
@@ -69,12 +69,13 @@ ss zero_field
   state trigger_mag_read
   {
     entry {
+      %% epicsTimeStamp new_time;
       ZF_TRANSITION_TO_STATE("trigger_mag_read");
       
       /* inverts each time around the main statemachine loop, giving a flashing effect if everything is working correctly. */
       PVPUT(statemachine_activity, !statemachine_activity);
-      %% clock_t new_time = clock();
-      %% double time_taken = 1000.0 * (new_time - _time_of_last_mag_read_trigger) / CLOCKS_PER_SEC;
+      %% epicsTimeGetCurrent(&new_time);
+      %% double time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_mag_read_trigger);
       PVPUT(statemachine_measured_loop_time, time_taken);
       
       if (debug) {
