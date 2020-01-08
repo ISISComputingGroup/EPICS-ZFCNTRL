@@ -3,7 +3,7 @@
 record(ai, "$(P)FIELD:$(AXIS):_RAW") {
   field(INP, "$(MAGNETOMETER):CORRECTEDFIELD:$(AXIS) CA MSS")
   field(EGU, "mG")
-  field(PREC, "6")
+  field(PREC, "2")
   
   field(FLNK, "$(P)FIELD:$(AXIS):MEAS:_RAW")
 }
@@ -14,7 +14,7 @@ record(calc, "$(P)FIELD:$(AXIS)") {
   field(INPB, "$(P)STATUS CP MS")
   field(CALC, "A")
   field(EGU, "mG")
-  field(PREC, "6")
+  field(PREC, "2")
   info(archive, "VAL")
   info(interest, "HIGH")
   info(alarm, "ZFCNTRL")
@@ -25,7 +25,7 @@ record(calc, "$(P)FIELD:$(AXIS)") {
 record(ai, "$(P)FIELD:$(AXIS):MEAS:_RAW") {
   field(INP, "$(MAGNETOMETER):MEASURED:$(AXIS) CA MSS")
   field(EGU, "mG")
-  field(PREC, "6")
+  field(PREC, "2")
   
   field(FLNK, "$(RAW_RECORD_FLNK)")
 }
@@ -36,7 +36,7 @@ record(calc, "$(P)FIELD:$(AXIS):MEAS") {
   field(INPB, "$(P)STATUS CP MS")
   field(CALC, "A")
   field(EGU, "mG")
-  field(PREC, "6")
+  field(PREC, "2")
   info(archive, "VAL")
   info(interest, "HIGH")
   info(alarm, "ZFCNTRL")
@@ -46,7 +46,7 @@ record(calc, "$(P)FIELD:$(AXIS):MEAS") {
 record(ao, "$(P)FIELD:$(AXIS):SP") {
   field(DESC, "Field setpoint $(AXIS)")
   field(EGU, "mG")
-  field(PREC, "6")
+  field(PREC, "2")
   
   info(archive, "VAL")
 }

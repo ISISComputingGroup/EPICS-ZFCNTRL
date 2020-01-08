@@ -112,7 +112,7 @@ record(ao, "$(P)STATEMACHINE:LOOP_DELAY")
 {
   field(DESC, "Wait between statemachine loops")
   field(EGU, "ms")
-  field(VAL, "100")
+  field(VAL, "250")
   field(PINI, "YES")
   field(PREC, "0")
   
@@ -130,7 +130,7 @@ record(ao, "$(P)STATEMACHINE:LOOP_DELAY")
 record(ao, "$(P)STATEMACHINE:READ_TIMEOUT")
 {
   field(EGU, "s")
-  field(VAL, "5")
+  field(VAL, "2")
   field(PINI, "YES")
   field(PREC, "0")
   
@@ -167,7 +167,7 @@ alias("$(P)AUTOFEEDBACK", "$(P)AUTOFEEDBACK:SP")
 record(ao, "$(P)TOLERANCE") {
   field(DESC, "Tolerance for 'stable' field")
   field(EGU, "mG")
-  field(PREC, "5")
+  field(PREC, "10")
   
   info(interest, "HIGH")
   info(archive, "VAL")
@@ -214,7 +214,7 @@ alias("$(P)P:FEEDBACK", "$(P)P:FEEDBACK:SP")
 record(ao, "$(P)OUTPUT:PSU_WRITE_TOLERANCE") {
   field(DESC, "Output power supply write tolerance")
   field(EGU, "A")
-  field(VAL, "0.000001")
+  field(VAL, "0.0002")
   field(PINI, "YES")
   
   info(archive, "VAL")
