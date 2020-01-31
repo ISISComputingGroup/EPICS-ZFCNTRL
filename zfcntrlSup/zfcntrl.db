@@ -173,23 +173,38 @@ record(ao, "$(P)TOLERANCE") {
   info(archive, "VAL")
 }
 
+# Any changes to this PV will also need reflecting in the sequencer .st file.
 record(mbbo, "$(P)STATUS") {
   field(DESC, "Status of ZF system")
+  
   field(ZRST, "No error")
+  field(ZRSV, "NO_ALARM")
+  
   field(ONST, "No new magnetometer data")
   field(ONSV, "INVALID")
+  
+  # Duplicated state, in auto mode there is a MAJOR alarm on this state.
   field(TWST, "Magnetometer overloaded")
   field(TWSV, "MAJOR")
-  field(THST, "Magnetometer data invalid")
-  field(THSV, "INVALID")
-  field(FRST, "Power supply invalid")
+  
+  # Duplicated state, in manual mode there is no alarm on this state.
+  field(THST, "Magnetometer overloaded")
+  field(THSV, "NO_ALARM")
+  
+  field(FRST, "Magnetometer data invalid")
   field(FRSV, "INVALID")
-  field(FVST, "Power supply on limits")
-  field(FVSV, "MAJOR")
-  field(SXST, "Power supply write failed")
-  field(SXSV, "INVALID")
-  field(SVST, "PSU high limit<low limit")
-  field(SVSV, "MAJOR")
+  
+  field(FVST, "Power supply invalid")
+  field(FVSV, "INVALID")
+  
+  field(SXST, "Power supply on limits")
+  field(SXSV, "MAJOR")
+  
+  field(SVST, "Power supply write failed")
+  field(SVSV, "INVALID")
+  
+  field(EIST, "PSU high limit<low limit")
+  field(EISV, "MAJOR")
   
   info(interest, "HIGH")
   info(archive, "VAL SEVR")

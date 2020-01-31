@@ -10,7 +10,7 @@ record(ai, "$(P)FIELD:$(AXIS):_RAW") {
 
 record(calc, "$(P)FIELD:$(AXIS)") {
   field(DESC, "Corrected field - axis $(AXIS)")
-  field(INPA, "$(P)FIELD:$(AXIS):_RAW CP MS")
+  field(INPA, "$(P)FIELD:$(AXIS):_RAW CP MSI")
   field(INPB, "$(P)STATUS CP MS")
   field(CALC, "A")
   field(EGU, "mG")
@@ -32,7 +32,7 @@ record(ai, "$(P)FIELD:$(AXIS):MEAS:_RAW") {
 
 record(calc, "$(P)FIELD:$(AXIS):MEAS") {
   field(DESC, "Measured field - axis $(AXIS)")
-  field(INPA, "$(P)FIELD:$(AXIS):MEAS:_RAW CP MS")
+  field(INPA, "$(P)FIELD:$(AXIS):MEAS:_RAW CP MSI")
   field(INPB, "$(P)STATUS CP MS")
   field(CALC, "A")
   field(EGU, "mG")

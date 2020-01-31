@@ -16,15 +16,16 @@ option +s;
 %{
   static const char* const PROGRAM_NAME = "zero_field.st";
 
-/* Define some error statuses. These should match the strings in $(P)STATUS */
-  static const char* const ZF_STAT_NO_ERROR = "No error";
-  static const char* const ZF_STAT_MAGNETOMETER_DATA_INVALID = "Magnetometer data invalid";
-  static const char* const ZF_STAT_MAGNETOMETER_DATA_STALE = "No new magnetometer data";
-  static const char* const ZF_STAT_MAGNETOMETER_OVERLOADED = "Magnetometer overloaded";
-  static const char* const ZF_STAT_PSU_INVALID = "Power supply invalid";
-  static const char* const ZF_STAT_PSU_ON_LIMITS = "Power supply on limits";
-  static const char* const ZF_STAT_PSU_WRITE_FAILED = "Power supply write failed";
-  static const char* const ZF_STAT_PSU_LIMITS_INCONSISTENT = "PSU high limit<low limit";
+  /* Define some error statuses. These should match the indices in $(P)STATUS */
+  static const int ZF_STAT_NO_ERROR = 0;
+  static const int ZF_STAT_MAGNETOMETER_DATA_STALE = 1;
+  static const int ZF_STAT_MAGNETOMETER_OVERLOADED_AUTO = 2;
+  static const int ZF_STAT_MAGNETOMETER_OVERLOADED_MANUAL = 3;
+  static const int ZF_STAT_MAGNETOMETER_DATA_INVALID = 4;
+  static const int ZF_STAT_PSU_INVALID = 5;
+  static const int ZF_STAT_PSU_ON_LIMITS = 6;
+  static const int ZF_STAT_PSU_WRITE_FAILED = 7;
+  static const int ZF_STAT_PSU_LIMITS_INCONSISTENT = 8;
   
   static const int PSU_MODE_VOLTAGE = 0;  
   static const int PSU_MODE_CURRENT = 1;  
@@ -105,13 +106,13 @@ ss zero_field
     
     when(new_readings_available && magnetometer_invalid(pVar)) {
       PVPUT(stable, 0);
-      PVPUTSTR(status, ZF_STAT_MAGNETOMETER_DATA_INVALID);
+      PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_INVALID);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading became available but severities were invalid.\n", PROGRAM_NAME);
     } state wait_before_read
     
     when(delay(read_timeout)) {
       PVPUT(stable, 0);
-      PVPUTSTR(status, ZF_STAT_MAGNETOMETER_DATA_STALE);
+      PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_STALE);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading did not become available.\n", PROGRAM_NAME);
       /* After this state go straight to trigger_mag_read rather than wait_before_read as we have already waited 5 seconds */
     } state trigger_mag_read
@@ -142,7 +143,7 @@ ss zero_field
     }
     
     when(magnetometer_overloaded) {
-      PVPUTSTR(status, ZF_STAT_MAGNETOMETER_OVERLOADED);
+      PVPUT(status, (auto_feedback_enabled ? ZF_STAT_MAGNETOMETER_OVERLOADED_AUTO : ZF_STAT_MAGNETOMETER_OVERLOADED_MANUAL));
       if (debug) {
         errlogSevPrintf(errlogInfo, "%s: Magnetometer overloaded - skipping PSU writes\n", PROGRAM_NAME);
       }
@@ -164,7 +165,7 @@ ss zero_field
         
     when(!auto_feedback_enabled) {
       /* If we get to this point, there is no error. Clear any previous error states. */
-      PVPUTSTR(status, ZF_STAT_NO_ERROR);
+      PVPUT(status, ZF_STAT_NO_ERROR);
       if (debug) {
         errlogSevPrintf(errlogMajor, "%s: Auto-feedback disabled - skipping PSU writes\n", PROGRAM_NAME);
       }
@@ -177,7 +178,7 @@ ss zero_field
     }
     
     when(power_supplies_invalid(pVar)) {
-      PVPUTSTR(status, ZF_STAT_PSU_INVALID);
+      PVPUT(status, ZF_STAT_PSU_INVALID);
       errlogSevPrintf(errlogMajor, "%s: Power supply is in invalid alarm. Not writing to power supplies.\n", PROGRAM_NAME);
     } state wait_before_read
     
@@ -214,7 +215,7 @@ ss zero_field
     
     when (delay(read_timeout)) {
       errlogSevPrintf(errlogMajor, "%s: Cannot get power supply into current mode.\n", PROGRAM_NAME);
-      PVPUTSTR(status, ZF_STAT_PSU_WRITE_FAILED);   
+      PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);   
     } state trigger_mag_read
   }
   
@@ -246,7 +247,7 @@ ss zero_field
     
     when (delay(read_timeout)) {
       errlogSevPrintf(errlogMajor, "%s: Cannot turn power supplies on.\n", PROGRAM_NAME);
-      PVPUTSTR(status, ZF_STAT_PSU_WRITE_FAILED);   
+      PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);   
     } state trigger_mag_read
   }
   
@@ -257,7 +258,7 @@ ss zero_field
     
     when(psu_limits_inconsistent(pVar)) {
       errlogSevPrintf(errlogMajor, "%s: power supply limits are inconsistent - cannot write to power supplies.\n", PROGRAM_NAME);
-      PVPUTSTR(status, ZF_STAT_PSU_LIMITS_INCONSISTENT);
+      PVPUT(status, ZF_STAT_PSU_LIMITS_INCONSISTENT);
     } state wait_before_read
     
     when(!psu_limits_inconsistent(pVar)) {
@@ -305,10 +306,10 @@ ss zero_field
       ) {
                 
         if (_output_on_limit) {
-          PVPUTSTR(status, ZF_STAT_PSU_ON_LIMITS);
+          PVPUT(status, ZF_STAT_PSU_ON_LIMITS);
         } else {
           /* If we get to this state, there has been no error */
-          PVPUTSTR(status, ZF_STAT_NO_ERROR);   
+          PVPUT(status, ZF_STAT_NO_ERROR);   
         }
         
         if (debug) {
@@ -317,7 +318,7 @@ ss zero_field
       } state wait_before_read
       
       when(delay(read_timeout)) {
-        PVPUTSTR(status, ZF_STAT_PSU_WRITE_FAILED);
+        PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);
         errlogSevPrintf(errlogMajor, "%s: Power supply writes failed to get within tolerance. Setpoints = (X=%f, Y=%f, Z=%f), setpoint readbacks = (X=%f, Y=%f, Z=%f). Tolerance=%f\n", 
           PROGRAM_NAME, output_psu_x_sp, output_psu_y_sp, output_psu_z_sp, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv, output_psu_tolerance); 
           
