@@ -7,7 +7,7 @@ record(bo, "$(P)DISABLE")
   field(ZNAM, "COMMS ENABLED")
   field(ONAM, "COMMS DISABLED")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 # Enable *very* verbose logging in the state machine.
@@ -26,7 +26,7 @@ record(bo, "$(P)DEBUG")
   field(ONAM, "Debug enabled")  
   field(OSV, "MINOR")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 # Tell the magnetometer to process it's PVs and get new values from hardware. This PV is processed
@@ -80,7 +80,7 @@ record(mbbo, "$(P)STATEMACHINE:STATE") {
   field(TTST, "wait_for_outputs_on")
   
   # Do not archive unless needed for debugging - this PV can change very quickly (~100Hz)
-  # info(archive, "VAL")
+  # info(archive, "5.0 VAL")
 }
 
 record(bo, "$(P)STATEMACHINE:ACTIVITY") {
@@ -99,7 +99,7 @@ record(ao, "$(P)STATEMACHINE:LOOP_TIME") {
   
   # Only log if changes by more than 5ms, otherwise database could fill with small fluctuations.
   field(ADEL, "5")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
   info(interest, "LOW")
 }
@@ -116,7 +116,7 @@ record(ao, "$(P)STATEMACHINE:LOOP_DELAY")
   field(PINI, "YES")
   field(PREC, "0")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(interest, "LOW")
 }
 
@@ -134,7 +134,7 @@ record(ao, "$(P)STATEMACHINE:READ_TIMEOUT")
   field(PINI, "YES")
   field(PREC, "0")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(interest, "LOW")
 }
 
@@ -145,7 +145,7 @@ record(bo, "$(P)STABLE") {
   field(ONAM, "Stable")
   
   info(interest, "HIGH")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
 }
 
@@ -159,7 +159,7 @@ record(bo, "$(P)AUTOFEEDBACK") {
   field(PINI, "YES")
   
   info(interest, "HIGH")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 alias("$(P)AUTOFEEDBACK", "$(P)AUTOFEEDBACK:SP")
@@ -170,7 +170,7 @@ record(ao, "$(P)TOLERANCE") {
   field(PREC, "10")
   
   info(interest, "HIGH")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 record(mbbo, "$(P)STATUS") {
@@ -204,7 +204,7 @@ record(ao, "$(P)P:FEEDBACK") {
   field(PINI, "YES")
   
   info(interest, "HIGH")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 alias("$(P)P:FEEDBACK", "$(P)P:FEEDBACK:SP")
@@ -217,7 +217,7 @@ record(ao, "$(P)OUTPUT:PSU_WRITE_TOLERANCE") {
   field(VAL, "0.0002")
   field(PINI, "YES")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(interest, "LOW")
 }
 
@@ -229,7 +229,7 @@ record(calc, "$(P)FIELD:MAGNITUDE") {
   field(CALC, "SQRT(A*A + B*B + C*C)")
   field(EGU, "mG")
   field(PREC, "2")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
   info(interest, "HIGH")
   field(ASG, "READONLY")
@@ -243,7 +243,7 @@ record(calc, "$(P)FIELD:MAGNITUDE:MEAS") {
   field(CALC, "SQRT(A*A + B*B + C*C)")
   field(EGU, "mG")
   field(PREC, "2")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
   info(interest, "HIGH")
   field(ASG, "READONLY")
