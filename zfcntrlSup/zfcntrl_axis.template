@@ -15,7 +15,7 @@ record(calc, "$(P)FIELD:$(AXIS)") {
   field(CALC, "A")
   field(EGU, "mG")
   field(PREC, "2")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(interest, "HIGH")
   info(alarm, "ZFCNTRL")
   field(ASG, "READONLY")
@@ -37,7 +37,7 @@ record(calc, "$(P)FIELD:$(AXIS):MEAS") {
   field(CALC, "A")
   field(EGU, "mG")
   field(PREC, "2")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(interest, "HIGH")
   info(alarm, "ZFCNTRL")
   field(ASG, "READONLY")
@@ -48,7 +48,7 @@ record(ao, "$(P)FIELD:$(AXIS):SP") {
   field(EGU, "mG")
   field(PREC, "2")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 # Proportional feedback factors - axis $(AXIS)
@@ -61,7 +61,7 @@ record(ao, "$(P)P:$(AXIS)") {
   field(PINI, "YES")
   
   info(interest, "HIGH")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 alias("$(P)P:$(AXIS)", "$(P)P:$(AXIS):SP")
@@ -79,7 +79,7 @@ record(ai, "$(P)OUTPUT:$(AXIS):CURR") {
   field(LLSV, "MAJOR")
   
   info(interest, "MEDIUM")
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
 }
 
@@ -112,7 +112,7 @@ record(ai, "$(P)OUTPUT:$(AXIS):CURR:SP:RBV") {
   field(HHSV, "MAJOR")
   field(LLSV, "MAJOR")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
 }
 
@@ -122,7 +122,7 @@ record(bi, "$(P)OUTPUT:$(AXIS):STATUS") {
   field(ZNAM, "Off")
   field(ONAM, "On")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
   info(interest, "LOW")
 }
@@ -137,7 +137,7 @@ record(bo, "$(P)OUTPUT:$(AXIS):STATUS:SP") {
   # may not necessarily cause the record on the other end to process.
   field(FLNK, "$(PSU_$(AXIS)):OUTPUTSTATUS:SP.PROC CA")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 record(bi, "$(P)OUTPUT:$(AXIS):MODE") {
@@ -146,7 +146,7 @@ record(bi, "$(P)OUTPUT:$(AXIS):MODE") {
   field(ZNAM, "Voltage")  field(ZSV, "MAJOR")  # Should never be in Voltage mode for the IOC to work correctly.
   field(ONAM, "Current")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
   info(interest, "LOW")
 }
@@ -161,7 +161,7 @@ record(bo, "$(P)OUTPUT:$(AXIS):MODE:SP") {
   # may not necessarily cause the record on the other end to process.
   field(FLNK, "$(PSU_$(AXIS)):OUTPUTMODE:SP.PROC CA")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 record(ai, "$(P)OUTPUT:$(AXIS):VOLT") {
@@ -170,7 +170,7 @@ record(ai, "$(P)OUTPUT:$(AXIS):VOLT") {
   field(INP, "$(PSU_$(AXIS)):VOLTAGE CPP MSS")
   field(PREC, "6")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
   info(interest, "LOW")
 }
 
@@ -184,7 +184,7 @@ record(ao, "$(P)OUTPUT:$(AXIS):VOLT:SP") {
   # may not necessarily cause the record on the other end to process.
   field(FLNK, "$(PSU_$(AXIS)):VOLTAGE:SP.PROC CA")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
 
 record(ai, "$(P)OUTPUT:$(AXIS):VOLT:SP:RBV") {
@@ -193,5 +193,5 @@ record(ai, "$(P)OUTPUT:$(AXIS):VOLT:SP:RBV") {
   field(INP, "$(PSU_$(AXIS)):VOLTAGE:SP:RBV CPP MSS")
   field(PREC, "6")
   
-  info(archive, "VAL")
+  info(archive, "5.0 VAL")
 }
