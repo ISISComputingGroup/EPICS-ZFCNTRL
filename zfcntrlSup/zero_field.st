@@ -225,10 +225,10 @@ ss zero_field
       ZF_TRANSITION_TO_STATE("ensure_voltage_limits");
     } 
     
-    /* set limits */
     when(psu_voltage_limits_set_correctly(pVar)) {
     } state ensure_outputs_on
     
+    /* set limits */
     when(!psu_voltage_limits_set_correctly(pVar)) {
         PVPUT(output_psu_x_volt_sp, requested_x_volt_limit);
         PVPUT(output_psu_y_volt_sp, requested_y_volt_limit);
