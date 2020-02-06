@@ -78,7 +78,9 @@ record(mbbo, "$(P)STATEMACHINE:STATE") {
   field(ELST, "wait_for_mode_current")
   field(TVST, "ensure_outputs_on")
   field(TTST, "wait_for_outputs_on")
-  
+  field(FTST, "ensure_voltage_limits")
+  field(FFST, "wait_for_voltage_limits")
+    
   # Do not archive unless needed for debugging - this PV can change very quickly (~100Hz)
   # info(archive, "5.0 VAL")
 }
@@ -170,6 +172,16 @@ record(ao, "$(P)TOLERANCE") {
   field(PREC, "10")
   
   info(interest, "HIGH")
+  info(archive, "5.0 VAL")
+}
+
+record(ao, "$(P)VOLT_LIMIT_TOLERANCE") {
+  field(DESC, "Tolerance for voltage limit")
+  field(EGU, "V")
+  field(PREC, "3")
+  field(VAL, "0.1")
+  field(PINI, "YES")
+  
   info(archive, "5.0 VAL")
 }
 

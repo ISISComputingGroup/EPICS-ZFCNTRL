@@ -42,10 +42,11 @@ option +s;
   static int power_supplies_invalid(struct seqg_vars* const pVar);
   static int magnetometer_invalid(struct seqg_vars* const pVar);
   static int is_within_tolerance(double setpoint, double readback, double tolerance);
-  static int all_power_suppies_on(struct seqg_vars* const pVar);
-  static int all_power_suppies_in_current_mode(struct seqg_vars* const pVar);
+  static int all_power_supplies_on(struct seqg_vars* const pVar);
+  static int all_power_supplies_in_current_mode(struct seqg_vars* const pVar);
   static double coerce_to_range(double value, double low_limit, double high_limit);
   static int psu_limits_inconsistent(struct seqg_vars* const pVar);
+  static int psu_voltage_limits_set_correctly(struct seqg_vars* const pVar);
   
   /* A timestamp from the last time we asked the magnetometer to take data. Used for loop time calculation. */
   epicsTimeStamp _time_of_last_mag_read_trigger;
@@ -192,11 +193,11 @@ ss zero_field
       ZF_TRANSITION_TO_STATE("ensure_mode_current");
     } 
     
-    when (all_power_suppies_in_current_mode(pVar)) {
+    when (all_power_supplies_in_current_mode(pVar)) {
       /* outputs already in correct mode, nothing to do here */
-    } state ensure_outputs_on
+    } state ensure_voltage_limits
     
-    when (!all_power_suppies_in_current_mode(pVar)) {
+    when (!all_power_supplies_in_current_mode(pVar)) {
       PVPUT(output_psu_x_mode_sp, PSU_MODE_CURRENT);
       PVPUT(output_psu_y_mode_sp, PSU_MODE_CURRENT);
       PVPUT(output_psu_z_mode_sp, PSU_MODE_CURRENT);
@@ -208,13 +209,46 @@ ss zero_field
       ZF_TRANSITION_TO_STATE("wait_for_mode_current");
     }
     
-    when (all_power_suppies_in_current_mode(pVar)) {
+    when (all_power_supplies_in_current_mode(pVar)) {
       /* modes are now correct */
       errlogSevPrintf(errlogInfo, "%s: Power supply outputs switched on successfully.\n", PROGRAM_NAME);
-    } state ensure_outputs_on
+    } state ensure_voltage_limits
     
     when (delay(read_timeout)) {
       errlogSevPrintf(errlogMajor, "%s: Cannot get power supply into current mode.\n", PROGRAM_NAME);
+      PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);   
+    } state trigger_mag_read
+  }
+    
+  state ensure_voltage_limits {
+    entry {
+      ZF_TRANSITION_TO_STATE("ensure_voltage_limits");
+    } 
+    
+    /* set limits */
+    when(psu_voltage_limits_set_correctly(pVar)) {
+    } state ensure_outputs_on
+    
+    when(!psu_voltage_limits_set_correctly(pVar)) {
+        PVPUT(output_psu_x_volt_sp, requested_x_volt_limit);
+        PVPUT(output_psu_y_volt_sp, requested_y_volt_limit);
+        PVPUT(output_psu_z_volt_sp, requested_z_volt_limit);
+    } state wait_for_voltage_limits
+
+  }
+  
+  state wait_for_voltage_limits {
+    entry {
+      ZF_TRANSITION_TO_STATE("wait_for_voltage_limits");
+    }
+    
+    when (psu_voltage_limits_set_correctly(pVar)) {
+      /* limits are now correct */
+      errlogSevPrintf(errlogInfo, "%s: Power supply voltage limits set successfully.\n", PROGRAM_NAME);
+    } state ensure_outputs_on
+    
+    when (delay(read_timeout)) {
+      errlogSevPrintf(errlogMajor, "%s: Cannot write power supply voltage limits.\n", PROGRAM_NAME);
       PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);   
     } state trigger_mag_read
   }
@@ -224,11 +258,11 @@ ss zero_field
       ZF_TRANSITION_TO_STATE("ensure_outputs_on");
     } 
     
-    when (all_power_suppies_on(pVar)) {
+    when (all_power_supplies_on(pVar)) {
       /* outputs already on, nothing to do here */
     } state write_to_psu
     
-    when (!all_power_suppies_on(pVar)) {
+    when (!all_power_supplies_on(pVar)) {
       PVPUT(output_psu_x_on_sp, PSU_STATUS_ON);
       PVPUT(output_psu_y_on_sp, PSU_STATUS_ON);
       PVPUT(output_psu_z_on_sp, PSU_STATUS_ON);
@@ -240,7 +274,7 @@ ss zero_field
       ZF_TRANSITION_TO_STATE("wait_for_outputs_on");
     }
     
-    when (all_power_suppies_on(pVar)) {
+    when (all_power_supplies_on(pVar)) {
       /* outputs have now turned on */
       errlogSevPrintf(errlogInfo, "%s: Power supply outputs switched on successfully.\n", PROGRAM_NAME);
     } state write_to_psu
@@ -364,7 +398,10 @@ ss zero_field
         || pVar->output_psu_z_mode_sevr == INVALID_ALARM
         || pVar->output_psu_x_sp_rbv_sevr == INVALID_ALARM 
         || pVar->output_psu_y_sp_rbv_sevr == INVALID_ALARM 
-        || pVar->output_psu_z_sp_rbv_sevr == INVALID_ALARM;
+        || pVar->output_psu_z_sp_rbv_sevr == INVALID_ALARM
+        || pVar->output_psu_x_volt_sp_rbv_sevr == INVALID_ALARM
+        || pVar->output_psu_y_volt_sp_rbv_sevr == INVALID_ALARM
+        || pVar->output_psu_z_volt_sp_rbv_sevr == INVALID_ALARM;
   }
   
   /**
@@ -401,13 +438,13 @@ ss zero_field
     }
   }
   
-  static int all_power_suppies_on(struct seqg_vars* const pVar) {
+  static int all_power_supplies_on(struct seqg_vars* const pVar) {
       return pVar->output_psu_x_on == PSU_STATUS_ON
           && pVar->output_psu_y_on == PSU_STATUS_ON
           && pVar->output_psu_z_on == PSU_STATUS_ON;
   }
   
-  static int all_power_suppies_in_current_mode(struct seqg_vars* const pVar) {
+  static int all_power_supplies_in_current_mode(struct seqg_vars* const pVar) {
       return pVar->output_psu_x_mode == PSU_MODE_CURRENT
           && pVar->output_psu_y_mode == PSU_MODE_CURRENT
           && pVar->output_psu_z_mode == PSU_MODE_CURRENT;
@@ -417,5 +454,11 @@ ss zero_field
       return (pVar->output_psu_x_sp_drvh < pVar->output_psu_x_sp_drvl)
           || (pVar->output_psu_y_sp_drvh < pVar->output_psu_y_sp_drvl)
           || (pVar->output_psu_z_sp_drvh < pVar->output_psu_z_sp_drvl);
+  }
+  
+  static int psu_voltage_limits_set_correctly(struct seqg_vars* const pVar) {
+      return (is_within_tolerance(pVar->output_psu_x_volt_sp_rbv, pVar->requested_x_volt_limit, pVar->volt_limit_tolerance))
+          && (is_within_tolerance(pVar->output_psu_y_volt_sp_rbv, pVar->requested_y_volt_limit, pVar->volt_limit_tolerance))
+          && (is_within_tolerance(pVar->output_psu_z_volt_sp_rbv, pVar->requested_z_volt_limit, pVar->volt_limit_tolerance));
   }
 }%
