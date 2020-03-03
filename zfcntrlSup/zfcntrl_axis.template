@@ -195,3 +195,13 @@ record(ai, "$(P)OUTPUT:$(AXIS):VOLT:SP:RBV") {
   
   info(archive, "5.0 VAL")
 }
+
+record(ao, "$(P)OUTPUT:$(AXIS):_VOLT_LIMIT") {
+  field(DESC, "Voltage limit - axis $(AXIS)")
+  field(EGU, "V")
+  field(PREC, "6")
+  field(VAL, "$(OUTPUT_VOLTAGE_$(AXIS)_MAX)")
+  field(PINI, "YES")
+  
+  info(archive, "5.0 VAL")
+}

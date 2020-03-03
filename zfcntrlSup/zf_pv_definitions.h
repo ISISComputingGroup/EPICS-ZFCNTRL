@@ -24,7 +24,7 @@ PV(int, output_psu_x_sevr, "{P}OUTPUT:X:CURR.SEVR", Monitor);
 PV(int, output_psu_y_sevr, "{P}OUTPUT:Y:CURR.SEVR", Monitor);
 PV(int, output_psu_z_sevr, "{P}OUTPUT:Z:CURR.SEVR", Monitor);
 
-/* Power supply setpoints */
+/* Power supply current setpoints */
 PV(double, output_psu_x_sp, "{P}OUTPUT:X:CURR:SP", NoMon);
 PV(double, output_psu_y_sp, "{P}OUTPUT:Y:CURR:SP", NoMon);
 PV(double, output_psu_z_sp, "{P}OUTPUT:Z:CURR:SP", NoMon);
@@ -32,7 +32,12 @@ PV(int, output_psu_x_sp_sevr, "{P}OUTPUT:X:CURR:SP.SEVR", Monitor);
 PV(int, output_psu_y_sp_sevr, "{P}OUTPUT:Y:CURR:SP.SEVR", Monitor);
 PV(int, output_psu_z_sp_sevr, "{P}OUTPUT:Z:CURR:SP.SEVR", Monitor);
 
-/* Power supply setpoint limits */
+/* Power supply voltage setpoints */
+PV(double, output_psu_x_volt_sp, "{P}OUTPUT:X:VOLT:SP", NoMon);
+PV(double, output_psu_y_volt_sp, "{P}OUTPUT:Y:VOLT:SP", NoMon);
+PV(double, output_psu_z_volt_sp, "{P}OUTPUT:Z:VOLT:SP", NoMon);
+
+/* Power supply current setpoint limits */
 PV(double, output_psu_x_sp_drvh, "{P}OUTPUT:X:CURR:SP.DRVH", Monitor);
 PV(double, output_psu_y_sp_drvh, "{P}OUTPUT:Y:CURR:SP.DRVH", Monitor);
 PV(double, output_psu_z_sp_drvh, "{P}OUTPUT:Z:CURR:SP.DRVH", Monitor);
@@ -40,13 +45,21 @@ PV(double, output_psu_x_sp_drvl, "{P}OUTPUT:X:CURR:SP.DRVL", Monitor);
 PV(double, output_psu_y_sp_drvl, "{P}OUTPUT:Y:CURR:SP.DRVL", Monitor);
 PV(double, output_psu_z_sp_drvl, "{P}OUTPUT:Z:CURR:SP.DRVL", Monitor);
 
-/* Power supply setpoint readbacks */
+/* Power supply current setpoint readbacks */
 PV(double, output_psu_x_sp_rbv, "{P}OUTPUT:X:CURR:SP:RBV", Monitor);
 PV(double, output_psu_y_sp_rbv, "{P}OUTPUT:Y:CURR:SP:RBV", Monitor);
 PV(double, output_psu_z_sp_rbv, "{P}OUTPUT:Z:CURR:SP:RBV", Monitor);
 PV(int, output_psu_x_sp_rbv_sevr, "{P}OUTPUT:X:CURR:SP:RBV.SEVR", Monitor);
 PV(int, output_psu_y_sp_rbv_sevr, "{P}OUTPUT:Y:CURR:SP:RBV.SEVR", Monitor);
 PV(int, output_psu_z_sp_rbv_sevr, "{P}OUTPUT:Z:CURR:SP:RBV.SEVR", Monitor);
+
+/* Power supply voltage setpoint readbacks */
+PV(double, output_psu_x_volt_sp_rbv, "{P}OUTPUT:X:VOLT:SP:RBV", Monitor);
+PV(double, output_psu_y_volt_sp_rbv, "{P}OUTPUT:Y:VOLT:SP:RBV", Monitor);
+PV(double, output_psu_z_volt_sp_rbv, "{P}OUTPUT:Z:VOLT:SP:RBV", Monitor);
+PV(int, output_psu_x_volt_sp_rbv_sevr, "{P}OUTPUT:X:VOLT:SP:RBV.SEVR", Monitor);
+PV(int, output_psu_y_volt_sp_rbv_sevr, "{P}OUTPUT:Y:VOLT:SP:RBV.SEVR", Monitor);
+PV(int, output_psu_z_volt_sp_rbv_sevr, "{P}OUTPUT:Z:VOLT:SP:RBV.SEVR", Monitor);
 
 /* Power supply outputs */
 PV(int, output_psu_x_on, "{P}OUTPUT:X:STATUS", Monitor);
@@ -73,6 +86,11 @@ PV(int, output_psu_z_mode_sp, "{P}OUTPUT:Z:MODE:SP", NoMon);
 /* Power supply write tolerance */
 PV(double, output_psu_tolerance, "{P}OUTPUT:PSU_WRITE_TOLERANCE", Monitor);
 
+/* Power supply requested voltage limits */
+PV(double, requested_x_volt_limit, "{P}OUTPUT:X:_VOLT_LIMIT", Monitor);
+PV(double, requested_y_volt_limit, "{P}OUTPUT:Y:_VOLT_LIMIT", Monitor);
+PV(double, requested_z_volt_limit, "{P}OUTPUT:Z:_VOLT_LIMIT", Monitor);
+
 /* Proportional feedback factors and fiddle factors */
 PV(double, amps_per_mg_x, "{P}P:X", Monitor);
 PV(double, amps_per_mg_y, "{P}P:Y", Monitor);
@@ -81,6 +99,9 @@ PV(double, feedback, "{P}P:FEEDBACK", Monitor);
 
 /* Tolerance of (actual-setpoint) for field to be considered stable */
 PV(double, tolerance, "{P}TOLERANCE", Monitor);
+
+/* Tolerance of voltage limit */
+PV(double, volt_limit_tolerance, "{P}VOLT_LIMIT_TOLERANCE", Monitor);
 
 /* Statuses for feedback to OPI etc */
 PV(string, statemachine_state, "{P}STATEMACHINE:STATE", NoMon);
