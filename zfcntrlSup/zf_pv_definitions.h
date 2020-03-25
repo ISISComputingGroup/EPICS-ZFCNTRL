@@ -110,7 +110,7 @@ PV(double, statemachine_measured_loop_time, "{P}STATEMACHINE:LOOP_TIME", NoMon);
 PV(double, loop_delay, "{P}STATEMACHINE:LOOP_DELAY", Monitor); /* msec */
 PV(double, read_timeout, "{P}STATEMACHINE:READ_TIMEOUT", Monitor); /* sec */
 PV(int, status, "{P}STATUS", NoMon);
-PV(int, stable, "{P}STABLE", Monitor);
+PV(int, at_setpoint, "{P}AT_SETPOINT", Monitor);
 
 /* Whether new readings are available from the magnetometer */
 PV(int, new_readings_available, "{P}_READINGS_READY", Monitor);

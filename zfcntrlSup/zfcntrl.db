@@ -140,11 +140,12 @@ record(ao, "$(P)STATEMACHINE:READ_TIMEOUT")
   info(interest, "LOW")
 }
 
-record(bo, "$(P)STABLE") {
-  field(DESC, "Stability of ZF system")
-  field(ZNAM, "Unstable")
-  field(ZSV, "MAJOR")
-  field(ONAM, "Stable")
+record(mbbo, "$(P)AT_SETPOINT") {
+  field(DESC, "Is measurement within tolerance of SP")
+  field(ZRST, "No")
+  field(ZRSV, "MAJOR")
+  field(ONST, "Yes")
+  field(TWST, "N/A")
   
   info(interest, "HIGH")
   info(archive, "5.0 VAL")
@@ -167,7 +168,7 @@ record(bo, "$(P)AUTOFEEDBACK") {
 alias("$(P)AUTOFEEDBACK", "$(P)AUTOFEEDBACK:SP")
 
 record(ao, "$(P)TOLERANCE") {
-  field(DESC, "Tolerance for 'stable' field")
+  field(DESC, "Tolerance for 'AT_SETPOINT' field")
   field(EGU, "mG")
   field(PREC, "10")
   

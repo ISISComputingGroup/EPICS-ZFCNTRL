@@ -106,13 +106,19 @@ ss zero_field
     } state check_corrected_field
     
     when(new_readings_available && magnetometer_invalid(pVar)) {
-      PVPUT(stable, 0);
+      if (auto_feedback_enabled) {
+        PVPUT(at_setpoint, 0);
+      }
+
       PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_INVALID);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading became available but severities were invalid.\n", PROGRAM_NAME);
     } state wait_before_read
     
     when(delay(read_timeout)) {
-      PVPUT(stable, 0);
+      if (auto_feedback_enabled) {
+        PVPUT(at_setpoint, 0);
+      }
+
       PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_STALE);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading did not become available.\n", PROGRAM_NAME);
       /* After this state go straight to trigger_mag_read rather than wait_before_read as we have already waited 5 seconds */
@@ -125,16 +131,19 @@ ss zero_field
     }
     
     when() {
-      int within_tolerance = is_within_tolerance(setpoint_x, magnetometer_x, tolerance) && 
-          is_within_tolerance(setpoint_y, magnetometer_y, tolerance) && 
-          is_within_tolerance(setpoint_z, magnetometer_z, tolerance);
-          
-      PVPUT(stable, within_tolerance);
-      
-      if (debug) {
-        errlogSevPrintf(errlogInfo, "%s: Magnetometer within tolerance: %s\n", PROGRAM_NAME, within_tolerance ? "True" : "False");
+      if (!auto_feedback_enabled) {
+        PVPUT(at_setpoint, 2);
+      } else {
+        int within_tolerance = is_within_tolerance(setpoint_x, magnetometer_x, tolerance) &&
+            is_within_tolerance(setpoint_y, magnetometer_y, tolerance) &&
+            is_within_tolerance(setpoint_z, magnetometer_z, tolerance);
+        
+        PVPUT(at_setpoint, within_tolerance);
+        
+        if (debug) {
+          errlogSevPrintf(errlogInfo, "%s: Magnetometer within tolerance: %s\n", PROGRAM_NAME, within_tolerance ? "True" : "False");
+        }
       }
-      
     } state check_raw_field
   }
   
