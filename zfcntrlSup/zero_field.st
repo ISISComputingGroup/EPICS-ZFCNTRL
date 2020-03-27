@@ -5,6 +5,7 @@ program zero_field("P")
 %% #include "seq_snc.h"
 %% #include "epicsTime.h"
 %% #include "string.h"
+%% #include "math.h"
 %% #include "errlog.h"
 %% #include "alarm.h"
 
