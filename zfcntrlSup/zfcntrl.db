@@ -145,6 +145,7 @@ record(mbbo, "$(P)AT_SETPOINT") {
   field(ZRST, "No")
   field(ZRSV, "MAJOR")
   field(ONST, "Yes")
+  # N/A is set when autofeedback is off
   field(TWST, "N/A")
   
   info(interest, "HIGH")
