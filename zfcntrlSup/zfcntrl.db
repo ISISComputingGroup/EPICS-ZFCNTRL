@@ -164,6 +164,7 @@ record(bo, "$(P)AUTOFEEDBACK") {
   
   info(interest, "HIGH")
   info(archive, "5.0 VAL")
+  info(autosaveFields, "VAL")
 }
 
 alias("$(P)AUTOFEEDBACK", "$(P)AUTOFEEDBACK:SP")
