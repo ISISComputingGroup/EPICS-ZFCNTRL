@@ -363,8 +363,12 @@ ss zero_field
       
       when(delay(read_timeout)) {
         PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);
-        errlogSevPrintf(errlogMajor, "%s: Power supply writes failed to get within tolerance. Setpoints = (X=%f, Y=%f, Z=%f), setpoint readbacks = (X=%f, Y=%f, Z=%f). Tolerance=%f\n", 
-          PROGRAM_NAME, output_psu_x_sp, output_psu_y_sp, output_psu_z_sp, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv, output_psu_tolerance); 
+        errlogSevPrintf(errlogMajor, "%s: Power supply writes failed to get within tolerance. Setpoints = (X=%f, Y=%f, Z=%f), "
+                                     "setpoint readbacks = (X=%f, Y=%f, Z=%f). Diffs = (dX=%f, dY=%f, dZ=%f). Tolerance=%f, Timeout=%f\n", 
+          PROGRAM_NAME, output_psu_x_sp, output_psu_y_sp, output_psu_z_sp,
+                        output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv,
+                        output_psu_x_sp - output_psu_x_sp_rbv, output_psu_y_sp - output_psu_y_sp_rbv, output_psu_z_sp - output_psu_z_sp_rbv,
+                        output_psu_tolerance, read_timeout); 
           
         /* don't go to wait_before_read in this case as we have already waited 5 seconds */
       } state trigger_mag_read
