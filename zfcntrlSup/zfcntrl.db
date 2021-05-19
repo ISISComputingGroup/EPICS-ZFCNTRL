@@ -159,8 +159,10 @@ record(bo, "$(P)AUTOFEEDBACK") {
   field(ONAM, "Auto-feedback")
   
   # There is a requirement to force manual mode on IOC start.
-  field(VAL, "0")
+  $(IFNOTSAVEFEEDBACKMODE) field(VAL, "0")
   field(PINI, "YES")
+  # We have put this in pass0 so it's restored quickly.
+  $(IFSAVEFEEDBACKMODE) info(autosaveFields_pass0, "VAL")
   
   info(interest, "HIGH")
   info(archive, "5.0 VAL")
