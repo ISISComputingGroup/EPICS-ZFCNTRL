@@ -330,7 +330,8 @@ ss zero_field
       }
       
       if (debug) {
-        errlogSevPrintf(errlogInfo, "%s: Writing to power supplies X=%f, Y=%f, Z=%f", PROGRAM_NAME, coerced_x, coerced_y, coerced_z); 
+        errlogSevPrintf(errlogInfo, "%s: Writing to power supplies X=%f, Y=%f, Z=%f",
+		                PROGRAM_NAME, coerced_x, coerced_y, coerced_z); 
       }
       PVPUT(output_psu_x_sp, coerced_x);
       PVPUT(output_psu_y_sp, coerced_y);
@@ -358,7 +359,8 @@ ss zero_field
         }
         
         if (debug) {
-          errlogSevPrintf(errlogInfo, "%s: power supply writes successful\n", PROGRAM_NAME);
+          errlogSevPrintf(errlogInfo, "%s: power supply writes successful X=%f, Y=%f, Z=%f\n",
+		                  PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
         }
       } state wait_before_read
       
