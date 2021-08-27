@@ -111,9 +111,21 @@ record(ai, "$(P)OUTPUT:$(AXIS):CURR:SP:RBV") {
   field(HIHI, "$(OUTPUT_$(AXIS)_MAX)")
   field(HHSV, "MAJOR")
   field(LLSV, "MAJOR")
+  field(FLNK, "$(P)OUTPUT:$(AXIS):CURR:SP:DIFF.PROC")
   
   info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
+}
+
+record(calc, "$(P)OUTPUT:$(AXIS):CURR:SP:DIFF") 
+{
+    field(DESC, "Current SP/RBV diff axis $(AXIS)")
+	field(INPA, "$(P)OUTPUT:$(AXIS):CURR:SP")
+	field(INPB, "$(P)OUTPUT:$(AXIS):CURR:SP:RBV")
+	field(CALC, "A-B")
+    field(SCAN, "Passive")
+    field(EGU, "A")
+    field(PREC, "5")
 }
 
 record(bi, "$(P)OUTPUT:$(AXIS):STATUS") {
