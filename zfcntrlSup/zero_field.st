@@ -43,6 +43,7 @@ option +s;
   static int power_supplies_invalid(struct seqg_vars* const pVar);
   static int magnetometer_invalid(struct seqg_vars* const pVar);
   static int is_within_tolerance(double setpoint, double readback, double tolerance);
+  static void report_tolerance_error(const char* axis, double sp, double sp_rpv, double tolerance, double timeout);
   static int all_power_supplies_on(struct seqg_vars* const pVar);
   static int all_power_supplies_in_current_mode(struct seqg_vars* const pVar);
   static double coerce_to_range(double value, double low_limit, double high_limit);
@@ -362,15 +363,12 @@ ss zero_field
       } state wait_before_read
       
       when(delay(read_timeout)) {
-        PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);
-        errlogSevPrintf(errlogMajor, "%s: Power supply writes failed to get within tolerance. Setpoints = (X=%f, Y=%f, Z=%f), "
-                                     "setpoint readbacks = (X=%f, Y=%f, Z=%f). Diffs = (dX=%f, dY=%f, dZ=%f). Tolerance=%f, Timeout=%f\n", 
-          PROGRAM_NAME, output_psu_x_sp, output_psu_y_sp, output_psu_z_sp,
-                        output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv,
-                        output_psu_x_sp - output_psu_x_sp_rbv, output_psu_y_sp - output_psu_y_sp_rbv, output_psu_z_sp - output_psu_z_sp_rbv,
-                        output_psu_tolerance, read_timeout); 
-          
-        /* don't go to wait_before_read in this case as we have already waited 5 seconds */
+          PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);
+		  report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
+		  report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
+		  report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
+   
+       /* don't go to wait_before_read in this case as we have already waited 5 seconds */
       } state trigger_mag_read
   }
   
@@ -434,6 +432,17 @@ ss zero_field
     return fabs(setpoint - readback) <= tolerance;
   }
   
+  /**
+   * Report error if axis out of tolerance
+   */
+    static void report_tolerance_error(const char* axis, double sp, double sp_rbv, double tolerance, double timeout)
+    {
+        if (!is_within_tolerance(sp, sp_rbv, tolerance)) {
+            errlogSevPrintf(errlogMajor, "%s: %s Power supply write failed to get within tolerance %f: SP=%f error=%f Timeout=%f\n", 
+                          PROGRAM_NAME, axis, tolerance, sp, sp - sp_rbv, timeout);
+        }
+    }
+
   /**
    * Coerces a floating point number to be within given low and high limits.
    */
