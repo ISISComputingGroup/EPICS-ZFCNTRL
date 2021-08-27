@@ -440,8 +440,8 @@ ss zero_field
     static void report_tolerance_error(const char* axis, double sp, double sp_rbv, double tolerance, double timeout)
     {
         if (!is_within_tolerance(sp, sp_rbv, tolerance)) {
-            errlogSevPrintf(errlogMajor, "%s: %s Power supply write failed to get within tolerance %f: SP=%f error=%f Timeout=%f\n", 
-                          PROGRAM_NAME, axis, tolerance, sp, sp - sp_rbv, timeout);
+            errlogSevPrintf(errlogMajor, "%s: %s Power supply write failed to get within tolerance %f: SP=%f SP:RBV=%f error=%f Timeout=%f\n",
+                          PROGRAM_NAME, axis, tolerance, sp, sp_rbv, sp - sp_rbv, timeout);
         }
     }
 
