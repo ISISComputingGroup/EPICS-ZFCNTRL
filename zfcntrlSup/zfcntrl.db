@@ -279,3 +279,12 @@ record(calc, "$(P)FIELD:MAGNITUDE:MEAS") {
   info(interest, "HIGH")
   field(ASG, "READONLY")
 }
+
+record(longout, "$(P)TOLERANCE_ERRORS") {
+    field(DESC, "Tolerance errors count since IOC start")
+    field(VAL, "0")
+    field(EGU, "")
+
+    info(archive, "5.0 VAL")
+    info(interest, "LOW")
+}

@@ -336,29 +336,20 @@ ss zero_field
       PVPUT(output_psu_x_sp, coerced_x);
       PVPUT(output_psu_y_sp, coerced_y);
       PVPUT(output_psu_z_sp, coerced_z);
-      
-    } state check_psu_writes
-  }
-  
-  state check_psu_writes {
-      entry {
-        ZF_TRANSITION_TO_STATE("check_psu_writes"); 
+
+      if (_output_on_limit) {
+        PVPUT(status, ZF_STAT_PSU_ON_LIMITS);
+      } else {
+        /* If we get to this state, there has been no error */
+        PVPUT(status, ZF_STAT_NO_ERROR);   
       }
       
-      when() {
-        if (_output_on_limit) {
-          PVPUT(status, ZF_STAT_PSU_ON_LIMITS);
-        } else {
-          /* If we get to this state, there has been no error */
-          PVPUT(status, ZF_STAT_NO_ERROR);   
-        }
-        
-        if (debug) {
-          errlogSevPrintf(errlogInfo, "%s: power supply writes successful X=%f, Y=%f, Z=%f\n",
-		                  PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
-        }
-      } state wait_before_read
+      if (debug) {
+        errlogSevPrintf(errlogInfo, "%s: power supply write set X=%f, Y=%f, Z=%f\n",
+                    PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
+      }
       
+    } state wait_before_read
   }
   
   state wait_before_read {

@@ -1,1 +1,2 @@
 registrar(zero_fieldRegistrar)
+registrar(zero_field_setpoint_readback_diagnosticsRegistrar)
