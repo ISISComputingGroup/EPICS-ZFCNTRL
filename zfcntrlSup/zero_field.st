@@ -345,12 +345,7 @@ ss zero_field
         ZF_TRANSITION_TO_STATE("check_psu_writes"); 
       }
       
-      when(
-        is_within_tolerance(output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance) &&
-        is_within_tolerance(output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance) &&
-        is_within_tolerance(output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance)
-      ) {
-                
+      when() {
         if (_output_on_limit) {
           PVPUT(status, ZF_STAT_PSU_ON_LIMITS);
         } else {
@@ -364,14 +359,6 @@ ss zero_field
         }
       } state wait_before_read
       
-      when(delay(read_timeout)) {
-          PVPUT(status, ZF_STAT_PSU_WRITE_FAILED);
-		  report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
-		  report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
-		  report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
-   
-       /* don't go to wait_before_read in this case as we have already waited 5 seconds */
-      } state trigger_mag_read
   }
   
   state wait_before_read {
