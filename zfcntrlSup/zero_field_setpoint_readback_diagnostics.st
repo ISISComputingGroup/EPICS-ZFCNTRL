@@ -17,11 +17,6 @@ option +s;
 %{
   static const char* const PROGRAM_NAME = "zero_field_setpoint_readback_diagnostics.st";
 
-  /* Store old values of psu writes to detect changes */
-  double old_output_psu_x_sp = 0;  
-  double old_output_psu_y_sp = 0;  
-  double old_output_psu_z_sp = 0;  
-
   /* Some necessary function forward-declarations - for implementations see end of file. */
   static int is_within_tolerance(double setpoint, double readback, double tolerance);
   static void report_tolerance_error(const char* axis, double sp, double sp_rpv, double tolerance, double timeout);
@@ -32,16 +27,12 @@ ss zero_field_setpoint_readback_diagnostics
   
   state idle {
     entry {
-        old_output_psu_x_sp = pvGet(output_psu_x_sp);
-        old_output_psu_y_sp = pvGet(output_psu_y_sp);
-        old_output_psu_z_sp = pvGet(output_psu_z_sp);
+      PVPUT(check_psu_tolerance, 0);
     }
 
-    when( 
-        old_output_psu_x_sp != output_psu_x_sp ||
-        old_output_psu_y_sp != output_psu_y_sp ||
-        old_output_psu_z_sp != output_psu_z_sp
-    ) { } state check_psu_writes
+    when(check_psu_tolerance == 1) { 
+
+    } state check_psu_writes
 
   }
 
@@ -58,6 +49,8 @@ ss zero_field_setpoint_readback_diagnostics
         //   /* If we get to this state, there has been no error */
         //   PVPUT(status, ZF_STAT_NO_ERROR);   
         // }
+        errlogSevPrintf(errlogInfo, "%s: power supply writes successful X=%f, Y=%f, Z=%f\n",
+		                  PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
         
         if (debug) {
           errlogSevPrintf(errlogInfo, "%s: power supply writes successful X=%f, Y=%f, Z=%f\n",
@@ -66,11 +59,11 @@ ss zero_field_setpoint_readback_diagnostics
       } state idle
       
       when(delay(read_timeout)) {
-          int incremented_tolerance_errors = pvGet(tolerance_errors) + 1;
-          PVPUT(tolerance_errors, incremented_tolerance_errors);
-		  report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
-		  report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
-		  report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
+          errlogSevPrintf(errlogInfo, "read timeout\n");
+          PVPUT(tolerance_errors, pvGet(tolerance_errors) + 1);
+		      report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
+		      report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
+		      report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
       } state idle
   }
 

@@ -343,6 +343,8 @@ ss zero_field
         /* If we get to this state, there has been no error */
         PVPUT(status, ZF_STAT_NO_ERROR);   
       }
+
+      PVPUT(check_psu_tolerance, 1);
       
       if (debug) {
         errlogSevPrintf(errlogInfo, "%s: power supply write set X=%f, Y=%f, Z=%f\n",

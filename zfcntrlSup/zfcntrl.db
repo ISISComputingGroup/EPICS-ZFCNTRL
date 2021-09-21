@@ -288,3 +288,15 @@ record(longout, "$(P)TOLERANCE_ERRORS") {
     info(archive, "5.0 VAL")
     info(interest, "LOW")
 }
+
+record(bo, "$(P)CHECK_PSU_TOLERANCE") {
+    field(DESC, "trigger to check psu tolerance")
+    field(VAL, "0")
+    field(ZNAM, "No trigger")
+    field(ONAM, "Trigger")
+    field(EGU, "")
+
+    info(archive, "5.0 VAL")
+    info(interest, "LOW")
+}
+
