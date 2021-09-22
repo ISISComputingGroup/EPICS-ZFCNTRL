@@ -25,9 +25,9 @@ PV(int, output_psu_y_sevr, "{P}OUTPUT:Y:CURR.SEVR", Monitor);
 PV(int, output_psu_z_sevr, "{P}OUTPUT:Z:CURR.SEVR", Monitor);
 
 /* Power supply current setpoints */
-PV(double, output_psu_x_sp, "{P}OUTPUT:X:CURR:SP", NoMon);
-PV(double, output_psu_y_sp, "{P}OUTPUT:Y:CURR:SP", NoMon);
-PV(double, output_psu_z_sp, "{P}OUTPUT:Z:CURR:SP", NoMon);
+PV(double, output_psu_x_sp, "{P}OUTPUT:X:CURR:SP", Monitor);
+PV(double, output_psu_y_sp, "{P}OUTPUT:Y:CURR:SP", Monitor);
+PV(double, output_psu_z_sp, "{P}OUTPUT:Z:CURR:SP", Monitor);
 PV(int, output_psu_x_sp_sevr, "{P}OUTPUT:X:CURR:SP.SEVR", Monitor);
 PV(int, output_psu_y_sp_sevr, "{P}OUTPUT:Y:CURR:SP.SEVR", Monitor);
 PV(int, output_psu_z_sp_sevr, "{P}OUTPUT:Z:CURR:SP.SEVR", Monitor);
