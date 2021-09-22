@@ -20,6 +20,8 @@ option +s;
   /* Some necessary function forward-declarations - for implementations see end of file. */
   static int is_within_tolerance(double setpoint, double readback, double tolerance);
   static void report_tolerance_error(const char* axis, double sp, double sp_rpv, double tolerance, double timeout);
+
+  int new_tolerance_errors = 0;
 }%
 
 ss zero_field_setpoint_readback_diagnostics
@@ -60,7 +62,8 @@ ss zero_field_setpoint_readback_diagnostics
       
       when(delay(read_timeout)) {
           errlogSevPrintf(errlogInfo, "read timeout\n");
-          PVPUT(tolerance_errors, pvGet(tolerance_errors) + 1);
+          new_tolerance_errors = pvGet(tolerance_errors) + 1;
+          PVPUT(tolerance_errors,  new_tolerance_errors);
 		      report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
 		      report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
 		      report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
