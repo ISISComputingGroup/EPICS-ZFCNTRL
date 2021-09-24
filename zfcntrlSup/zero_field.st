@@ -342,14 +342,12 @@ ss zero_field
           errlogSevPrintf(errlogInfo, "%s: power supply writes successful X=%f, Y=%f, Z=%f\n",
 		                  PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
         }
-        tolerance_success += 1;
-        pvPut(tolerance_success);
+        PVPUT(memory_entry, 100);
       } else {
         report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
         report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
         report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
-        tolerance_errors += 1;
-        pvPut(tolerance_errors);
+        PVPUT(memory_entry, 0);
       }
       PVPUT(output_psu_x_sp, coerced_x);
       PVPUT(output_psu_y_sp, coerced_y);

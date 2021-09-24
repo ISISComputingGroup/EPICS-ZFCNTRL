@@ -280,34 +280,33 @@ record(calc, "$(P)FIELD:MAGNITUDE:MEAS") {
   field(ASG, "READONLY")
 }
 
-record(longout, "$(P)TOLERANCE_ERRORS") {
-    field(DESC, "Times sprbv didn't reach sp")
-    field(VAL, "0")
-    field(EGU, "")
+record(longout, "$(P)MEMORY_ENTRY") {
+  field(DESC, "Times sprbv did reach sp")
+  field(VAL, "0")
+  field(EGU, "")
 
-    info(archive, "5.0 VAL")
-    info(interest, "LOW")
+  info(archive, "5.0 VAL")
+  info(interest, "LOW")
 }
 
-record(longout, "$(P)TOLERANCE_SUCCESS") {
-    field(DESC, "Times sprbv did reach sp")
-    field(VAL, "0")
-    field(EGU, "")
 
-    info(archive, "5.0 VAL")
-    info(interest, "LOW")
+record(compress, "$(P)READBACK_MEMORY") {
+  field(INP, "$(P)MEMORY_ENTRY MSS")
+  field(ALG, "Circular Buffer")
+  field(NSAM, "1000")
+  field(FLNK, "$(P)TOLERANCE_SUCCESS_PERCENT")
+  
+  info(archive, "5.0 VAL")
+  info(interest, "LOW")
 }
 
-record(calc, "$(P)TOLERANCE_SUCCESS_PERCENT") {
-    field(DESC, "% of times sprbv did reach sp")
-    field(VAL, "0")
-    field(EGU, "%")
-
-    field(INPA, "$(P)TOLERANCE_SUCCESS CP MS")
-    field(INPB, "$(P)TOLERANCE_ERRORS CP MS")
-
-    field(CALC, "(A / (A + B)) * 100")
-
-    info(archive, "5.0 VAL"))
-    info(interest, "LOW")
+record(compress, "$(P)TOLERANCE_SUCCESS_PERCENT") {
+  field(INP, "$(P)READBACK_MEMORY MSS")
+  field(ALG, "N to 1 Average")
+  field(NSAM, "1")
+  field(N, "1000")
+  field(EGU, "%")
+  
+  info(archive, "5.0 VAL")
+  info(interest, "LOW")
 }
