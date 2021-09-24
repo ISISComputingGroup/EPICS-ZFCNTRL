@@ -284,6 +284,7 @@ record(longout, "$(P)MEMORY_ENTRY") {
   field(DESC, "Times sprbv did reach sp")
   field(VAL, "0")
   field(EGU, "")
+  field(FLNK, "$(P)READBACK_MEMORY")
 
   info(archive, "5.0 VAL")
   info(interest, "LOW")
