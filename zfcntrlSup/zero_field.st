@@ -333,11 +333,27 @@ ss zero_field
         errlogSevPrintf(errlogInfo, "%s: Writing to power supplies X=%f, Y=%f, Z=%f",
 		                PROGRAM_NAME, coerced_x, coerced_y, coerced_z); 
       }
+      if (
+        is_within_tolerance(output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance) &&
+        is_within_tolerance(output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance) &&
+        is_within_tolerance(output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance)
+      ) {
+        if (debug) {
+          errlogSevPrintf(errlogInfo, "%s: power supply writes successful X=%f, Y=%f, Z=%f\n",
+		                  PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
+        }
+      } else {
+        report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
+        report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
+        report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
+        tolerance_errors += 1;
+        pvPut(tolerance_errors);
+      }
       PVPUT(output_psu_x_sp, coerced_x);
       PVPUT(output_psu_y_sp, coerced_y);
       PVPUT(output_psu_z_sp, coerced_z);
       
-    } state check_psu_writes
+    } state wait_before_read
   }
   
   state check_psu_writes {
