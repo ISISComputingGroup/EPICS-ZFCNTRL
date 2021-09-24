@@ -294,7 +294,7 @@ record(longout, "$(P)MEMORY_ENTRY") {
 record(compress, "$(P)READBACK_MEMORY") {
   field(INP, "$(P)MEMORY_ENTRY MSS")
   field(ALG, "Circular Buffer")
-  field(NSAM, "1000")
+  field(NSAM, "100")
   field(FLNK, "$(P)TOLERANCE_SUCCESS_PERCENT")
   
   info(archive, "5.0 VAL")
@@ -305,7 +305,7 @@ record(compress, "$(P)TOLERANCE_SUCCESS_PERCENT") {
   field(INP, "$(P)READBACK_MEMORY MSS")
   field(ALG, "N to 1 Average")
   field(NSAM, "1")
-  field(N, "1000")
+  field(N, "100")
   field(EGU, "%")
   
   info(archive, "5.0 VAL")
