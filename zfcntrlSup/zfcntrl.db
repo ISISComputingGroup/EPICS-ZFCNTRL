@@ -301,13 +301,13 @@ record(longout, "$(P)TOLERANCE_SUCCESS") {
 record(calc, "$(P)TOLERANCE_SUCCESS_PERCENT") {
     field(DESC, "% of times sprbv did reach sp")
     field(VAL, "0")
-    field(EGU, "")
+    field(EGU, "%")
 
     field(INPA, "$(P)TOLERANCE_SUCCESS CP MS")
     field(INPB, "$(P)TOLERANCE_ERRORS CP MS")
 
-    field(CALC, "A / (A + B)")
-    
-    info(archive, "5.0 VAL")
+    field(CALC, "(A / (A + B)) * 100")
+
+    info(archive, "5.0 VAL"))
     info(interest, "LOW")
 }
