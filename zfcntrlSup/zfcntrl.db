@@ -281,10 +281,33 @@ record(calc, "$(P)FIELD:MAGNITUDE:MEAS") {
 }
 
 record(longout, "$(P)TOLERANCE_ERRORS") {
-    field(DESC, "Tolerance errors count since IOC start")
+    field(DESC, "Times sprbv didn't reach sp")
     field(VAL, "0")
     field(EGU, "")
 
+    info(archive, "5.0 VAL")
+    info(interest, "LOW")
+}
+
+record(longout, "$(P)TOLERANCE_SUCCESS") {
+    field(DESC, "Times sprbv did reach sp")
+    field(VAL, "0")
+    field(EGU, "")
+
+    info(archive, "5.0 VAL")
+    info(interest, "LOW")
+}
+
+record(calc, "$(P)TOLERANCE_SUCCESS_PERCENT") {
+    field(DESC, "% of times sprbv did reach sp")
+    field(VAL, "0")
+    field(EGU, "")
+
+    field(INPA, "$(P)TOLERANCE_SUCCESS CP MS")
+    field(INPB, "$(P)TOLERANCE_ERRORS CP MS")
+
+    field(CALC, "A / (A + B)")
+    
     info(archive, "5.0 VAL")
     info(interest, "LOW")
 }
