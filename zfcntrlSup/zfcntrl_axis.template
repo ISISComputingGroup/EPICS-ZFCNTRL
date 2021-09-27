@@ -217,3 +217,13 @@ record(ao, "$(P)OUTPUT:$(AXIS):_VOLT_LIMIT") {
   
   info(archive, "5.0 VAL")
 }
+
+record(ao, "$(P)OUTPUT:$(AXIS):PSU_WRITE_TOLERANCE") {
+  field(DESC, "Output power supply write tolerance")
+  field(EGU, "A")
+  field(VAL, "0.0002")
+  field(PINI, "YES")
+  
+  info(archive, "5.0 VAL")
+  info(interest, "LOW")
+}

@@ -85,6 +85,9 @@ PV(int, output_psu_z_mode_sp, "{P}OUTPUT:Z:MODE:SP", NoMon);
 
 /* Power supply write tolerance */
 PV(double, output_psu_tolerance, "{P}OUTPUT:PSU_WRITE_TOLERANCE", Monitor);
+PV(double, output_psu_x_tolerance, "{P}OUTPUT:X:PSU_WRITE_TOLERANCE", Monitor);
+PV(double, output_psu_y_tolerance, "{P}OUTPUT:Y:PSU_WRITE_TOLERANCE", Monitor);
+PV(double, output_psu_z_tolerance, "{P}OUTPUT:Z:PSU_WRITE_TOLERANCE", Monitor);
 PV(long, memory_entry, "{P}MEMORY_ENTRY", Monitor);
 
 /* Power supply requested voltage limits */
