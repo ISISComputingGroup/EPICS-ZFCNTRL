@@ -1,6 +1,6 @@
 program zero_field("P")
 
-#include "seqPVmacros.h"
+#include "ibexSeqPVmacros.h"
 #include "zf_pv_definitions.h"
 %% #include "seq_snc.h"
 %% #include "epicsTime.h"
