@@ -27,6 +27,7 @@ option +s;
   static const int ZF_STAT_PSU_ON_LIMITS = 6;
   static const int ZF_STAT_PSU_WRITE_FAILED = 7;
   static const int ZF_STAT_PSU_LIMITS_INCONSISTENT = 8;
+  static const int ZF_STAT_PSU_SP_RBV_OUT_OF_RANGE = 9;
   
   static const int PSU_MODE_VOLTAGE = 0;  
   static const int PSU_MODE_CURRENT = 1;  
@@ -48,6 +49,7 @@ option +s;
   static int all_power_supplies_in_current_mode(struct seqg_vars* const pVar);
   static double coerce_to_range(double value, double low_limit, double high_limit);
   static int psu_limits_inconsistent(struct seqg_vars* const pVar);
+  static int psu_sp_rbv_out_of_range(struct seqg_vars* const pVar);
   static int psu_voltage_limits_set_correctly(struct seqg_vars* const pVar);
   
   /* A timestamp from the last time we asked the magnetometer to take data. Used for loop time calculation. */
@@ -306,7 +308,12 @@ ss zero_field
       PVPUT(status, ZF_STAT_PSU_LIMITS_INCONSISTENT);
     } state wait_before_read
     
-    when(!psu_limits_inconsistent(pVar)) {
+	when(psu_sp_rbv_out_of_range(pVar)) {
+		errlogSevPrintf(errlogMajor, "%s: power supply setpoint readbacks are outside limits - cannot write to power supplies.\n", PROGRAM_NAME);
+		PVPUT(status, ZF_STAT_PSU_SP_RBV_OUT_OF_RANGE);	
+	} state wait_before_read
+	
+    when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)) {
       double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
       double new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
       double new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
@@ -370,7 +377,7 @@ ss zero_field
 		  report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
 		  report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
    
-       /* don't go to wait_before_read in this case as we have already waited 5 seconds */
+       /*do not go to wait_before_read in this case as we have already waited 5 seconds*/
       } state trigger_mag_read
   }
   
@@ -479,6 +486,15 @@ ss zero_field
       return (pVar->output_psu_x_sp_drvh < pVar->output_psu_x_sp_drvl)
           || (pVar->output_psu_y_sp_drvh < pVar->output_psu_y_sp_drvl)
           || (pVar->output_psu_z_sp_drvh < pVar->output_psu_z_sp_drvl);
+  }
+  
+  static int psu_sp_rbv_out_of_range(struct seqg_vars* const pVar) {
+	  return (pVar->output_psu_x_sp_rbv > pVar->output_psu_x_sp_drvh)
+		  || (pVar->output_psu_x_sp_rbv < pVar->output_psu_x_sp_drvl)
+		  || (pVar->output_psu_y_sp_rbv > pVar->output_psu_y_sp_drvh)
+		  || (pVar->output_psu_y_sp_rbv < pVar->output_psu_y_sp_drvl)
+		  || (pVar->output_psu_z_sp_rbv > pVar->output_psu_z_sp_drvh)
+		  || (pVar->output_psu_z_sp_rbv < pVar->output_psu_z_sp_drvl);
   }
   
   static int psu_voltage_limits_set_correctly(struct seqg_vars* const pVar) {

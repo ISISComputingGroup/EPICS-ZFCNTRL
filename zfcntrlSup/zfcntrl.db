@@ -222,6 +222,9 @@ record(mbbo, "$(P)STATUS") {
   field(EIST, "PSU high limit<low limit")
   field(EISV, "MAJOR")
   
+  field(NIST, "PSU sp_rbv out of range")
+  field(NISV, "MAJOR")
+  
   info(interest, "HIGH")
   info(archive, "VAL SEVR")
   info(alarm, "ZFCNTRL")
