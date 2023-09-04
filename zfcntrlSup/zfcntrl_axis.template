@@ -94,18 +94,15 @@ record(ao, "$(P)OUTPUT:$(AXIS):CURR:SP") {
   field(LLSV, "MAJOR")
   field(OUT, "$(PSU_$(AXIS)):CURRENT:SP CA")
   field(PREC, "6")
-  
-  # Explicitly process it, as EPICS documentation suggests PP over CA
-  # may not necessarily cause the record on the other end to process.
-  field(FLNK, "$(PSU_$(AXIS)):CURRENT:SP.PROC CA")
-  
   info(archive, "VAL DRVL DRVH")
 }
 
+# note we access the _CURRENT:SP:RBV kepco field
+# for performance reasons
 record(ai, "$(P)OUTPUT:$(AXIS):CURR:SP:RBV") {
   field(DESC, "Current setpoint readback- axis $(AXIS)")
   field(EGU, "A")
-  field(INP, "$(PSU_$(AXIS)):CURRENT:SP:RBV CPP MSS")
+  field(INP, "$(PSU_$(AXIS)):_CURRENT:SP:RBV CP MSS")
   field(PREC, "6")
   field(LOLO, "$(OUTPUT_$(AXIS)_MIN)")
   field(HIHI, "$(OUTPUT_$(AXIS)_MAX)")
@@ -144,20 +141,15 @@ record(bo, "$(P)OUTPUT:$(AXIS):STATUS:SP") {
   field(OUT, "$(PSU_$(AXIS)):OUTPUTSTATUS:SP CA")
   field(ZNAM, "Off")
   field(ONAM, "On")
-  
-  # Explicitly process it, as EPICS documentation suggests PP over CA
-  # may not necessarily cause the record on the other end to process.
-  field(FLNK, "$(PSU_$(AXIS)):OUTPUTSTATUS:SP.PROC CA")
-  
   info(archive, "5.0 VAL")
 }
 
 record(bi, "$(P)OUTPUT:$(AXIS):MODE") {
   field(DESC, "Output mode - axis $(AXIS)")
   field(INP, "$(PSU_$(AXIS)):OUTPUTMODE CPP MSS")
-  field(ZNAM, "Voltage")  field(ZSV, "MAJOR")  # Should never be in Voltage mode for the IOC to work correctly.
+  field(ZNAM, "Voltage")
+  field(ZSV, "MAJOR")  # Should never be in Voltage mode for the IOC to work correctly.
   field(ONAM, "Current")
-  
   info(archive, "5.0 VAL")
   info(alarm, "ZFCNTRL")
   info(interest, "LOW")
@@ -168,11 +160,6 @@ record(bo, "$(P)OUTPUT:$(AXIS):MODE:SP") {
   field(OUT, "$(PSU_$(AXIS)):OUTPUTMODE:SP CA")
   field(ZNAM, "Voltage")
   field(ONAM, "Current")
-  
-  # Explicitly process it, as EPICS documentation suggests PP over CA
-  # may not necessarily cause the record on the other end to process.
-  field(FLNK, "$(PSU_$(AXIS)):OUTPUTMODE:SP.PROC CA")
-  
   info(archive, "5.0 VAL")
 }
 
@@ -191,11 +178,6 @@ record(ao, "$(P)OUTPUT:$(AXIS):VOLT:SP") {
   field(EGU, "V")
   field(OUT, "$(PSU_$(AXIS)):VOLTAGE:SP CA")
   field(PREC, "6")
-  
-  # Explicitly process it, as EPICS documentation suggests PP over CA
-  # may not necessarily cause the record on the other end to process.
-  field(FLNK, "$(PSU_$(AXIS)):VOLTAGE:SP.PROC CA")
-  
   info(archive, "5.0 VAL")
 }
 
