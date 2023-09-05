@@ -68,6 +68,9 @@ ss zero_field
     entry {
       ZF_TRANSITION_TO_STATE("initializing");
       %% epicsTimeGetCurrent(&_time_of_last_mag_read_trigger);
+	  output_psu_x_sp = output_psu_x_sp_rbv;
+	  output_psu_y_sp = output_psu_y_sp_rbv;
+	  output_psu_z_sp = output_psu_z_sp_rbv;
     }
     when (){} state trigger_mag_read
   }
@@ -180,6 +183,10 @@ ss zero_field
     when(!auto_feedback_enabled) {
       /* If we get to this point, there is no error. Clear any previous error states. */
       PVPUT(status, ZF_STAT_NO_ERROR);
+	  /* update our internal sp variables ready for autofeedback later */
+	  output_psu_x_sp = output_psu_x_sp_rbv;
+	  output_psu_y_sp = output_psu_y_sp_rbv;
+	  output_psu_z_sp = output_psu_z_sp_rbv;
       if (debug) {
         errlogSevPrintf(errlogMajor, "%s: Auto-feedback disabled - skipping PSU writes\n", PROGRAM_NAME);
       }
@@ -314,9 +321,9 @@ ss zero_field
 	} state wait_before_read
 	
     when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)) {
-      double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
-      double new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
-      double new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
+      double new_x = output_psu_x_sp + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
+      double new_y = output_psu_y_sp + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
+      double new_z = output_psu_z_sp + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
       
       double coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
       double coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
