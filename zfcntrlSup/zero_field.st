@@ -97,7 +97,7 @@ ss zero_field
     }
     
     when() {
-      PVPUT(new_readings_available, 0);
+      PVPUTF(new_readings_available, 0, SYNC);
       PVPUT(trigger_read, 1);
     } state wait_for_mag_read
   }
@@ -109,10 +109,12 @@ ss zero_field
     }
     
     when(new_readings_available && !magnetometer_invalid(pVar)) {
+      PVPUTF(new_readings_available, 0, SYNC);
       /* intentionally empty */
     } state check_corrected_field
     
     when(new_readings_available && magnetometer_invalid(pVar)) {
+      PVPUTF(new_readings_available, 0, SYNC);
       if (auto_feedback_enabled) {
         PVPUT(at_setpoint, 0);
       }
@@ -135,6 +137,12 @@ ss zero_field
   state check_corrected_field {
     entry {
       ZF_TRANSITION_TO_STATE("check_corrected_field");
+	  pvGet(setpoint_x, SYNC);
+	  pvGet(setpoint_y, SYNC);
+	  pvGet(setpoint_z, SYNC);
+	  pvGet(magnetometer_x, SYNC);
+	  pvGet(magnetometer_y, SYNC);
+	  pvGet(magnetometer_z, SYNC);
     }
     
     when() {

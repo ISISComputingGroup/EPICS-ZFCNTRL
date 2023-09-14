@@ -1,7 +1,10 @@
-/* Field readings from magnetometer */
-PV(double, magnetometer_x, "{P}FIELD:X:_RAW", Monitor);
-PV(double, magnetometer_y, "{P}FIELD:Y:_RAW", Monitor);
-PV(double, magnetometer_z, "{P}FIELD:Z:_RAW", Monitor);
+/* Field readings from magnetometer
+ * we use NoMon and use pvGet in SNL to ensure we have
+ * a correct value
+ */
+PV(double, magnetometer_x, "{P}FIELD:X:_RAW", NoMon);
+PV(double, magnetometer_y, "{P}FIELD:Y:_RAW", NoMon);
+PV(double, magnetometer_z, "{P}FIELD:Z:_RAW", NoMon);
 
 /* Severities from magnetometer */
 PV(int, magnetometer_x_sevr, "{P}FIELD:X:_RAW.SEVR", Monitor);
@@ -11,10 +14,13 @@ PV(int, magnetometer_z_sevr, "{P}FIELD:Z:_RAW.SEVR", Monitor);
 /* Magnetometer overload */
 PV(int, magnetometer_overloaded, "{P}MAGNETOMETER:OVERLOAD", Monitor);
 
-/* Field setpoints */
-PV(double, setpoint_x, "{P}FIELD:X:SP", Monitor);
-PV(double, setpoint_y, "{P}FIELD:Y:SP", Monitor);
-PV(double, setpoint_z, "{P}FIELD:Z:SP", Monitor);
+/* Field setpoints
+ * we use NoMon and use pvGet in SNL to ensure we have
+ * a correct value
+ */
+PV(double, setpoint_x, "{P}FIELD:X:SP", NoMon);
+PV(double, setpoint_y, "{P}FIELD:Y:SP", NoMon);
+PV(double, setpoint_z, "{P}FIELD:Z:SP", NoMon);
 
 /* Power supply currents */
 PV(double, output_psu_x, "{P}OUTPUT:X:CURR", Monitor);
