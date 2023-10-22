@@ -47,6 +47,7 @@ record(ao, "$(P)FIELD:$(AXIS):SP") {
   field(DESC, "Field setpoint $(AXIS)")
   field(EGU, "mG")
   field(PREC, "2")
+  field(UDFS, "NO_ALARM")
   
   info(archive, "5.0 VAL")
 }

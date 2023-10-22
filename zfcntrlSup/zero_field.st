@@ -314,9 +314,9 @@ ss zero_field
 	} state wait_before_read
 	
     when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)) {
-      double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
-      double new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
-      double new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
+      double new_x = output_psu_x + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
+      double new_y = output_psu_y + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
+      double new_z = output_psu_z + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
       
       double coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
       double coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
