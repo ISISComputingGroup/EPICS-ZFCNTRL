@@ -1,7 +1,7 @@
 /* Field readings from magnetometer */
-PV(double, magnetometer_x, "{P}FIELD:X:_RAW", Monitor);
-PV(double, magnetometer_y, "{P}FIELD:Y:_RAW", Monitor);
-PV(double, magnetometer_z, "{P}FIELD:Z:_RAW", Monitor);
+PV(double, magnetometer_x, "{P}FIELD:X", Monitor);
+PV(double, magnetometer_y, "{P}FIELD:Y", Monitor);
+PV(double, magnetometer_z, "{P}FIELD:Z", Monitor);
 
 /* Severities from magnetometer */
 PV(int, magnetometer_x_sevr, "{P}FIELD:X:_RAW.SEVR", Monitor);
