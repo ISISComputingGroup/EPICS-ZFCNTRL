@@ -1,7 +1,7 @@
 /* Field readings from magnetometer */
-PV(double, magnetometer_x, "{P}FIELD:X", Monitor);
-PV(double, magnetometer_y, "{P}FIELD:Y", Monitor);
-PV(double, magnetometer_z, "{P}FIELD:Z", Monitor);
+PV(double, magnetometer_x, "{P}FIELD:X:_RAW", Monitor);
+PV(double, magnetometer_y, "{P}FIELD:Y:_RAW", Monitor);
+PV(double, magnetometer_z, "{P}FIELD:Z:_RAW", Monitor);
 
 /* Severities from magnetometer */
 PV(int, magnetometer_x_sevr, "{P}FIELD:X:_RAW.SEVR", Monitor);
@@ -107,6 +107,8 @@ PV(double, volt_limit_tolerance, "{P}VOLT_LIMIT_TOLERANCE", Monitor);
 PV(string, statemachine_state, "{P}STATEMACHINE:STATE", NoMon);
 PV(int, statemachine_activity, "{P}STATEMACHINE:ACTIVITY", Monitor);
 PV(double, statemachine_measured_loop_time, "{P}STATEMACHINE:LOOP_TIME", NoMon); /* msec */
+PV(double, statemachine_measured_read_time, "{P}STATEMACHINE:READ_TIME", NoMon); /* msec */
+PV(double, statemachine_measured_write_time, "{P}STATEMACHINE:WRITE_TIME", NoMon); /* msec */
 PV(double, loop_delay, "{P}STATEMACHINE:LOOP_DELAY", Monitor); /* msec */
 PV(double, read_timeout, "{P}STATEMACHINE:READ_TIMEOUT", Monitor); /* sec */
 PV(int, status, "{P}STATUS", NoMon);

@@ -90,7 +90,7 @@ record(bo, "$(P)STATEMACHINE:ACTIVITY") {
 }
 
 record(ao, "$(P)STATEMACHINE:LOOP_TIME") {
-  field(DESC, "Time between magnetometer readings")
+  field(DESC, "Time between magnetometer triggers")
   field(EGU, "ms")
   field(PREC, "0")
   
@@ -105,6 +105,39 @@ record(ao, "$(P)STATEMACHINE:LOOP_TIME") {
   info(alarm, "ZFCNTRL")
   info(interest, "LOW")
 }
+
+record(ao, "$(P)STATEMACHINE:READ_TIME") {
+  field(DESC, "Time for magnetometer read")
+  field(EGU, "ms")
+  field(PREC, "0")
+  
+  field(HIHI, "1000")
+  field(LOLO, "1")
+  field(HHSV, "MINOR")
+  field(LLSV, "MINOR")
+  
+  # Only log if changes by more than 5ms, otherwise database could fill with small fluctuations.
+  field(ADEL, "5")
+  info(archive, "5.0 VAL")
+  info(interest, "LOW")
+}
+
+record(ao, "$(P)STATEMACHINE:WRITE_TIME") {
+  field(DESC, "Time for PSU write")
+  field(EGU, "ms")
+  field(PREC, "0")
+  
+  field(HIHI, "1000")
+  field(LOLO, "1")
+  field(HHSV, "MINOR")
+  field(LLSV, "MINOR")
+  
+  # Only log if changes by more than 5ms, otherwise database could fill with small fluctuations.
+  field(ADEL, "5")
+  info(archive, "5.0 VAL")
+  info(interest, "LOW")
+}
+
 
 # Sleep after each statemachine loop. Making this too small will mean the 
 # power supplies and/or magnetometer cannot keep up with the command rate
