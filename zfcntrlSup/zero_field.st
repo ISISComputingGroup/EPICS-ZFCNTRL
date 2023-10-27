@@ -328,17 +328,24 @@ ss zero_field
 	} state wait_before_read
 	
     when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)) {
-      double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
-      double new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
-      double new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
+     /* make sure we definitely have readings */
+      double new_x, new_y, new_z, coerced_x, coerced_y, coerced_z;
+	  int x_on_limit, y_on_limit, z_on_limit;
+	  pvGet(output_psu_x_sp_rbv, SYNC);
+	  pvGet(output_psu_y_sp_rbv, SYNC);
+	  pvGet(output_psu_z_sp_rbv, SYNC);
+
+      new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
+      new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
+      new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
       
-      double coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
-      double coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
-      double coerced_z = coerce_to_range(new_z, output_psu_z_sp_drvl, output_psu_z_sp_drvh);
+      coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
+      coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
+      coerced_z = coerce_to_range(new_z, output_psu_z_sp_drvl, output_psu_z_sp_drvh);
       
-      int x_on_limit = (new_x != coerced_x);
-      int y_on_limit = (new_y != coerced_y);
-      int z_on_limit = (new_z != coerced_z);
+      x_on_limit = (new_x != coerced_x);
+      y_on_limit = (new_y != coerced_y);
+      z_on_limit = (new_z != coerced_z);
       
       if (x_on_limit || y_on_limit || z_on_limit) {
         errlogSevPrintf(errlogMajor, "%s: power supply outputs on limits. Attempted to set (X=%f, Y=%f, Z=%f) but instead set (X=%f, Y=%f, Z=%f)\n", 
@@ -354,9 +361,15 @@ ss zero_field
         errlogSevPrintf(errlogInfo, "%s: Writing to power supplies X=%f, Y=%f, Z=%f",
 		                PROGRAM_NAME, coerced_x, coerced_y, coerced_z); 
       }
-      PVPUT(output_psu_x_sp, coerced_x);
-      PVPUT(output_psu_y_sp, coerced_y);
-      PVPUT(output_psu_z_sp, coerced_z);
+	  if (update_psu_x_sp) {
+          PVPUT(output_psu_x_sp, coerced_x);
+	  }
+	  if (update_psu_y_sp) {
+          PVPUT(output_psu_y_sp, coerced_y);
+	  }
+	  if (update_psu_z_sp) {
+          PVPUT(output_psu_z_sp, coerced_z);
+	  }
       
     } state check_psu_writes
   }

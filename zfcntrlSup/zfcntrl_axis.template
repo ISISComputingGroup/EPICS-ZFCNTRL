@@ -98,6 +98,14 @@ record(ao, "$(P)OUTPUT:$(AXIS):CURR:SP") {
   info(archive, "VAL DRVL DRVH")
 }
 
+record(bo, "$(P)OUTPUT:$(AXIS):CURR:UPDATE:SP") {
+  field(DESC, "Update Current SP for $(AXIS)")
+  field(ZNAM, "NO")
+  field(ONAM, "YES")
+  field(PINI, "YES")
+  field(VAL, "1")
+}
+
 # note we access the _CURRENT:SP:RBV kepco field
 # for performance reasons
 record(ai, "$(P)OUTPUT:$(AXIS):CURR:SP:RBV") {
