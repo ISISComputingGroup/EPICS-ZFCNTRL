@@ -84,6 +84,8 @@ record(ai, "$(P)OUTPUT:$(AXIS):CURR") {
   info(alarm, "ZFCNTRL")
 }
 
+# note we access the _CURRENT:SP kepco field
+# for performance reasons
 record(ao, "$(P)OUTPUT:$(AXIS):CURR:SP") {
   field(DESC, "Current setpoint - axis $(AXIS)")
   field(EGU, "A")
@@ -93,9 +95,9 @@ record(ao, "$(P)OUTPUT:$(AXIS):CURR:SP") {
   field(HIHI, "$(OUTPUT_$(AXIS)_MAX)")
   field(HHSV, "MAJOR")
   field(LLSV, "MAJOR")
-  field(OUT, "$(PSU_$(AXIS)):CURRENT:SP CA")
+  field(OUT, "$(PSU_$(AXIS)):_CURRENT:SP CA")
   field(PREC, "6")
-  info(archive, "VAL DRVL DRVH")
+  info(archive, "5.0 VAL DRVL DRVH")
 }
 
 record(bo, "$(P)OUTPUT:$(AXIS):CURR:UPDATE:SP") {
