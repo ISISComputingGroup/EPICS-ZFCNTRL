@@ -85,7 +85,7 @@ record(mbbo, "$(P)STATEMACHINE:STATE") {
   # info(archive, "5.0 VAL")
 }
 
-record(bo, "$(P)STATEMACHINE:ACTIVITY") {
+record(bi, "$(P)STATEMACHINE:ACTIVITY") {
   field(DESC, "Blinking if IOC is active")
 }
 
@@ -293,6 +293,8 @@ alias("$(P)P:FEEDBACK", "$(P)P:FEEDBACK:SP")
 
 
 # Allowable difference between PSU setpoint and readback before write is considered to have failed
+# for a kepco bop 36-6M this is 2mA in low current range and 1.2mA in high current range
+# hence use 0.0012 
 record(ao, "$(P)OUTPUT:PSU_WRITE_TOLERANCE") {
   field(DESC, "Output power supply write tolerance")
   field(EGU, "A")

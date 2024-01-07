@@ -70,6 +70,7 @@ ss zero_field
     entry {
       ZF_TRANSITION_TO_STATE("initializing");
       %% epicsTimeGetCurrent(&_time_of_last_mag_read_trigger);
+	  statemachine_activity = 0;
     }
     when (){} state trigger_mag_read
   }
@@ -415,7 +416,6 @@ ss zero_field
 		  report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
 		  report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
 	      PVPUT(statemachine_measured_check_time, read_timeout * 1000.0);
-		  errlogSevPrintf(errlogMajor, "%s: power supply write did not get within tolerance.\n", PROGRAM_NAME);
    
        /*do not go to wait_before_read in this case as we have already waited 5 seconds*/
       } state trigger_mag_read

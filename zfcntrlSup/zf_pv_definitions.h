@@ -110,7 +110,7 @@ PV(double, volt_limit_tolerance, "{P}VOLT_LIMIT_TOLERANCE", Monitor);
 
 /* Statuses for feedback to OPI etc */
 PV(string, statemachine_state, "{P}STATEMACHINE:STATE", NoMon);
-PV(int, statemachine_activity, "{P}STATEMACHINE:ACTIVITY", Monitor);
+PV(int, statemachine_activity, "{P}STATEMACHINE:ACTIVITY", NoMon);
 PV(double, statemachine_measured_loop_time, "{P}STATEMACHINE:LOOP_TIME", NoMon); /* msec */
 PV(double, statemachine_measured_read_time, "{P}STATEMACHINE:READ_TIME", NoMon); /* msec */
 PV(double, statemachine_measured_write_time, "{P}STATEMACHINE:WRITE_TIME", NoMon); /* msec */
