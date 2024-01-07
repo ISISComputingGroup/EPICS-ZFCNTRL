@@ -55,6 +55,7 @@ option +s;
   /* A timestamp from the last time we asked the magnetometer to take data. Used for loop time calculation. */
   epicsTimeStamp _time_of_last_mag_read_trigger;
   epicsTimeStamp _time_of_last_psu_write_trigger;
+  epicsTimeStamp _time_of_last_psu_check_trigger;
   
   /* flag to track whether power supply outputs were limited or not. Need this flag to be able to set correct errors. */
   int _output_on_limit = 0;
@@ -329,6 +330,8 @@ ss zero_field
 	
     when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)) {
      /* make sure we definitely have readings */
+      %% epicsTimeStamp new_time;
+      %% double time_taken;                
       double new_x, new_y, new_z, coerced_x, coerced_y, coerced_z;
 	  int x_on_limit, y_on_limit, z_on_limit;
 	  pvGet(output_psu_x_sp_rbv, SYNC);
@@ -370,6 +373,9 @@ ss zero_field
 	  if (update_psu_z_sp) {
           PVPUT(output_psu_z_sp, coerced_z);
 	  }
+	  %% epicsTimeGetCurrent(&new_time);
+      %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_psu_write_trigger);
+	  PVPUT(statemachine_measured_write_time, time_taken);
       
     } state check_psu_writes
   }
@@ -377,6 +383,7 @@ ss zero_field
   state check_psu_writes {
       entry {
         ZF_TRANSITION_TO_STATE("check_psu_writes"); 
+        %% epicsTimeGetCurrent(&_time_of_last_psu_check_trigger);
       }
       
       when(
@@ -398,8 +405,8 @@ ss zero_field
 		                  PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
         }
 		%% epicsTimeGetCurrent(&new_time);
-        %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_psu_write_trigger);
-	    PVPUT(statemachine_measured_write_time, time_taken);
+        %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_psu_check_trigger);
+	    PVPUT(statemachine_measured_check_time, time_taken);
       } state wait_before_read
       
       when(delay(read_timeout)) {
@@ -407,7 +414,8 @@ ss zero_field
 		  report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
 		  report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
 		  report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
-	      PVPUT(statemachine_measured_write_time, read_timeout * 1000.0);
+	      PVPUT(statemachine_measured_check_time, read_timeout * 1000.0);
+		  errlogSevPrintf(errlogMajor, "%s: power supply write did not get within tolerance.\n", PROGRAM_NAME);
    
        /*do not go to wait_before_read in this case as we have already waited 5 seconds*/
       } state trigger_mag_read

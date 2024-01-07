@@ -138,6 +138,21 @@ record(ao, "$(P)STATEMACHINE:WRITE_TIME") {
   info(interest, "LOW")
 }
 
+record(ao, "$(P)STATEMACHINE:CHECK_TIME") {
+  field(DESC, "Time to check PSU write")
+  field(EGU, "ms")
+  field(PREC, "1")
+  
+  field(HIHI, "100")
+  field(LOLO, "0")
+  field(HHSV, "MINOR")
+  field(LLSV, "MINOR")
+  
+  # Only log if changes by more than 10ms, otherwise database could fill with small fluctuations.
+  field(ADEL, "10")
+  info(archive, "5.0 VAL")
+  info(interest, "LOW")
+}
 
 # Sleep after each statemachine loop. Making this too small will mean the 
 # power supplies and/or magnetometer cannot keep up with the command rate
@@ -173,7 +188,7 @@ record(ao, "$(P)STATEMACHINE:READ_TIMEOUT")
   info(interest, "LOW")
 }
 
-record(mbbo, "$(P)AT_SETPOINT") {
+record(mbbi, "$(P)AT_SETPOINT") {
   field(DESC, "Is measurement within tolerance of SP")
   field(ZRST, "No")
   field(ZRSV, "MAJOR")
@@ -206,7 +221,7 @@ alias("$(P)AUTOFEEDBACK", "$(P)AUTOFEEDBACK:SP")
 record(ao, "$(P)TOLERANCE") {
   field(DESC, "Tolerance for 'AT_SETPOINT' field")
   field(EGU, "mG")
-  field(PREC, "10")
+  field(PREC, "3")
   
   info(interest, "HIGH")
   info(archive, "5.0 VAL")
@@ -283,6 +298,7 @@ record(ao, "$(P)OUTPUT:PSU_WRITE_TOLERANCE") {
   field(EGU, "A")
   field(VAL, "0.0012")
   field(PINI, "YES")
+  field(PREC, 4)
   
   info(archive, "5.0 VAL")
   info(interest, "LOW")
