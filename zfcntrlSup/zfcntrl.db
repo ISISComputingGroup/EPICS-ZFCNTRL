@@ -117,7 +117,7 @@ record(ao, "$(P)STATEMACHINE:READ_TIME") {
   field(LLSV, "MINOR")
   
   # Only log if changes by more than 10ms, otherwise database could fill with small fluctuations.
-  field(ADEL, "10")
+  field(ADEL, "5")
   info(archive, "5.0 VAL")
   info(interest, "LOW")
 }
@@ -133,7 +133,7 @@ record(ao, "$(P)STATEMACHINE:WRITE_TIME") {
   field(LLSV, "MINOR")
   
   # Only log if changes by more than 10ms, otherwise database could fill with small fluctuations.
-  field(ADEL, "10")
+  field(ADEL, "5")
   info(archive, "5.0 VAL")
   info(interest, "LOW")
 }
@@ -149,7 +149,7 @@ record(ao, "$(P)STATEMACHINE:CHECK_TIME") {
   field(LLSV, "MINOR")
   
   # Only log if changes by more than 10ms, otherwise database could fill with small fluctuations.
-  field(ADEL, "10")
+  field(ADEL, "5")
   info(archive, "5.0 VAL")
   info(interest, "LOW")
 }
