@@ -54,6 +54,8 @@ option +s;
   
   /* A timestamp from the last time we asked the magnetometer to take data. Used for loop time calculation. */
   epicsTimeStamp _time_of_last_mag_read_trigger;
+  epicsTimeStamp _time_of_last_psu_write_trigger;
+  epicsTimeStamp _time_of_last_psu_check_trigger;
   
   /* flag to track whether power supply outputs were limited or not. Need this flag to be able to set correct errors. */
   int _output_on_limit = 0;
@@ -68,6 +70,7 @@ ss zero_field
     entry {
       ZF_TRANSITION_TO_STATE("initializing");
       %% epicsTimeGetCurrent(&_time_of_last_mag_read_trigger);
+	  statemachine_activity = 0;
     }
     when (){} state trigger_mag_read
   }
@@ -94,7 +97,7 @@ ss zero_field
     }
     
     when() {
-      PVPUT(new_readings_available, 0);
+      PVPUTF(new_readings_available, 0, SYNC);
       PVPUT(trigger_read, 1);
     } state wait_for_mag_read
   }
@@ -106,23 +109,35 @@ ss zero_field
     }
     
     when(new_readings_available && !magnetometer_invalid(pVar)) {
-      /* intentionally empty */
+      %% epicsTimeStamp new_time;
+      %% double time_taken;
+     /* make sure we definitely have readings */
+	  pvGet(magnetometer_x, SYNC);
+	  pvGet(magnetometer_y, SYNC);
+	  pvGet(magnetometer_z, SYNC);
+      %% epicsTimeGetCurrent(&new_time);
+      %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_mag_read_trigger);
+	  PVPUT(statemachine_measured_read_time, time_taken);
     } state check_corrected_field
     
     when(new_readings_available && magnetometer_invalid(pVar)) {
+      %% epicsTimeStamp new_time;
+      %% double time_taken;
       if (auto_feedback_enabled) {
         PVPUT(at_setpoint, 0);
       }
-
       PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_INVALID);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading became available but severities were invalid.\n", PROGRAM_NAME);
+      %% epicsTimeGetCurrent(&new_time);
+      %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_mag_read_trigger);
+	  PVPUT(statemachine_measured_read_time, time_taken);
     } state wait_before_read
     
     when(delay(read_timeout)) {
       if (auto_feedback_enabled) {
         PVPUT(at_setpoint, 0);
       }
-
+	  PVPUT(statemachine_measured_read_time, read_timeout * 1000.0);
       PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_STALE);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading did not become available.\n", PROGRAM_NAME);
       /* After this state go straight to trigger_mag_read rather than wait_before_read as we have already waited 5 seconds */
@@ -301,6 +316,7 @@ ss zero_field
   state write_to_psu {
     entry {
       ZF_TRANSITION_TO_STATE("write_to_psu");
+      %% epicsTimeGetCurrent(&_time_of_last_psu_write_trigger);
     }
     
     when(psu_limits_inconsistent(pVar)) {
@@ -314,17 +330,26 @@ ss zero_field
 	} state wait_before_read
 	
     when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)) {
-      double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
-      double new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
-      double new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
+     /* make sure we definitely have readings */
+      %% epicsTimeStamp new_time;
+      %% double time_taken;                
+      double new_x, new_y, new_z, coerced_x, coerced_y, coerced_z;
+	  int x_on_limit, y_on_limit, z_on_limit;
+	  pvGet(output_psu_x_sp_rbv, SYNC);
+	  pvGet(output_psu_y_sp_rbv, SYNC);
+	  pvGet(output_psu_z_sp_rbv, SYNC);
+
+      new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
+      new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
+      new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
       
-      double coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
-      double coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
-      double coerced_z = coerce_to_range(new_z, output_psu_z_sp_drvl, output_psu_z_sp_drvh);
+      coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
+      coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
+      coerced_z = coerce_to_range(new_z, output_psu_z_sp_drvl, output_psu_z_sp_drvh);
       
-      int x_on_limit = (new_x != coerced_x);
-      int y_on_limit = (new_y != coerced_y);
-      int z_on_limit = (new_z != coerced_z);
+      x_on_limit = (new_x != coerced_x);
+      y_on_limit = (new_y != coerced_y);
+      z_on_limit = (new_z != coerced_z);
       
       if (x_on_limit || y_on_limit || z_on_limit) {
         errlogSevPrintf(errlogMajor, "%s: power supply outputs on limits. Attempted to set (X=%f, Y=%f, Z=%f) but instead set (X=%f, Y=%f, Z=%f)\n", 
@@ -340,9 +365,18 @@ ss zero_field
         errlogSevPrintf(errlogInfo, "%s: Writing to power supplies X=%f, Y=%f, Z=%f",
 		                PROGRAM_NAME, coerced_x, coerced_y, coerced_z); 
       }
-      PVPUT(output_psu_x_sp, coerced_x);
-      PVPUT(output_psu_y_sp, coerced_y);
-      PVPUT(output_psu_z_sp, coerced_z);
+	  if (update_psu_x_sp) {
+          PVPUT(output_psu_x_sp, coerced_x);
+	  }
+	  if (update_psu_y_sp) {
+          PVPUT(output_psu_y_sp, coerced_y);
+	  }
+	  if (update_psu_z_sp) {
+          PVPUT(output_psu_z_sp, coerced_z);
+	  }
+	  %% epicsTimeGetCurrent(&new_time);
+      %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_psu_write_trigger);
+	  PVPUT(statemachine_measured_write_time, time_taken);
       
     } state check_psu_writes
   }
@@ -350,6 +384,7 @@ ss zero_field
   state check_psu_writes {
       entry {
         ZF_TRANSITION_TO_STATE("check_psu_writes"); 
+        %% epicsTimeGetCurrent(&_time_of_last_psu_check_trigger);
       }
       
       when(
@@ -357,7 +392,8 @@ ss zero_field
         is_within_tolerance(output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance) &&
         is_within_tolerance(output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance)
       ) {
-                
+        %% epicsTimeStamp new_time;
+        %% double time_taken;                
         if (_output_on_limit) {
           PVPUT(status, ZF_STAT_PSU_ON_LIMITS);
         } else {
@@ -369,6 +405,9 @@ ss zero_field
           errlogSevPrintf(errlogInfo, "%s: power supply writes successful X=%f, Y=%f, Z=%f\n",
 		                  PROGRAM_NAME, output_psu_x_sp_rbv, output_psu_y_sp_rbv, output_psu_z_sp_rbv);
         }
+		%% epicsTimeGetCurrent(&new_time);
+        %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_psu_check_trigger);
+	    PVPUT(statemachine_measured_check_time, time_taken);
       } state wait_before_read
       
       when(delay(read_timeout)) {
@@ -376,6 +415,7 @@ ss zero_field
 		  report_tolerance_error("X", output_psu_x_sp, output_psu_x_sp_rbv, output_psu_tolerance, read_timeout);
 		  report_tolerance_error("Y", output_psu_y_sp, output_psu_y_sp_rbv, output_psu_tolerance, read_timeout);
 		  report_tolerance_error("Z", output_psu_z_sp, output_psu_z_sp_rbv, output_psu_tolerance, read_timeout);
+	      PVPUT(statemachine_measured_check_time, read_timeout * 1000.0);
    
        /*do not go to wait_before_read in this case as we have already waited 5 seconds*/
       } state trigger_mag_read
