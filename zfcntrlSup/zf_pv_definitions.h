@@ -10,6 +10,11 @@ PV(int, magnetometer_z_sevr, "{P}FIELD:Z:_RAW.SEVR", Monitor);
 
 /* Magnetometer overload */
 PV(int, magnetometer_overloaded, "{P}MAGNETOMETER:OVERLOAD", Monitor);
+/*
+PV(int, magnetometer_overloaded_x, "{P}MAGNETOMETER:OVERLOAD:X", Monitor);
+PV(int, magnetometer_overloaded_y, "{P}MAGNETOMETER:OVERLOAD:Y", Monitor);
+PV(int, magnetometer_overloaded_z, "{P}MAGNETOMETER:OVERLOAD:Z", Monitor);
+*/
 
 /* Field setpoints */
 PV(double, setpoint_x, "{P}FIELD:X:SP", Monitor);
@@ -115,8 +120,10 @@ PV(double, statemachine_measured_loop_time, "{P}STATEMACHINE:LOOP_TIME", NoMon);
 PV(double, statemachine_measured_read_time, "{P}STATEMACHINE:READ_TIME", NoMon); /* msec */
 PV(double, statemachine_measured_write_time, "{P}STATEMACHINE:WRITE_TIME", NoMon); /* msec */
 PV(double, statemachine_measured_check_time, "{P}STATEMACHINE:CHECK_TIME", NoMon); /* msec */
+PV(double, statemachine_measured_overload_time, "{P}STATEMACHINE:OVERLOAD_TIME", NoMon); /* sec */
 PV(double, loop_delay, "{P}STATEMACHINE:LOOP_DELAY", Monitor); /* msec */
 PV(double, read_timeout, "{P}STATEMACHINE:READ_TIMEOUT", Monitor); /* sec */
+PV(double, overload_timeout, "{P}STATEMACHINE:OVERLOAD_TIMEOUT", Monitor); /* sec */
 PV(int, status, "{P}STATUS", NoMon);
 PV(int, at_setpoint, "{P}AT_SETPOINT", NoMon);
 

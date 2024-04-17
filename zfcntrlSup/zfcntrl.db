@@ -170,6 +170,22 @@ record(ao, "$(P)STATEMACHINE:LOOP_DELAY")
   info(interest, "LOW")
 }
 
+record(ao, "$(P)STATEMACHINE:OVERLOAD_TIMEOUT")
+{
+  field(DESC, "Overload timeout")
+  field(VAL, "600")
+  field(PINI, "YES")
+  field(PREC, "1")
+  field(EGU, "s")
+  info(archive, "VAL")
+}
+
+record(ai, "$(P)STATEMACHINE:OVERLOAD_TIME")
+{
+  field(DESC, "Overload time")
+  field(EGU, "s")
+}
+
 # Timeout in seconds to get readbacks from external IOCs
 # 
 # Used for:
