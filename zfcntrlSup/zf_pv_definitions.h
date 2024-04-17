@@ -107,8 +107,11 @@ PV(double, volt_limit_tolerance, "{P}VOLT_LIMIT_TOLERANCE", Monitor);
 PV(string, statemachine_state, "{P}STATEMACHINE:STATE", NoMon);
 PV(int, statemachine_activity, "{P}STATEMACHINE:ACTIVITY", Monitor);
 PV(double, statemachine_measured_loop_time, "{P}STATEMACHINE:LOOP_TIME", NoMon); /* msec */
+PV(double, statemachine_measured_overload_time, "{P}STATEMACHINE:OVERLOAD_TIME", NoMon); /* sec */
 PV(double, loop_delay, "{P}STATEMACHINE:LOOP_DELAY", Monitor); /* msec */
 PV(double, read_timeout, "{P}STATEMACHINE:READ_TIMEOUT", Monitor); /* sec */
+PV(double, overload_timeout, "{P}STATEMACHINE:OVERLOAD_TIMEOUT", Monitor); /* sec */
+
 PV(int, status, "{P}STATUS", NoMon);
 PV(int, at_setpoint, "{P}AT_SETPOINT", Monitor);
 

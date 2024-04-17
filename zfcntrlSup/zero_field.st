@@ -54,6 +54,7 @@ option +s;
   
   /* A timestamp from the last time we asked the magnetometer to take data. Used for loop time calculation. */
   epicsTimeStamp _time_of_last_mag_read_trigger;
+  epicsTimeStamp _time_of_last_magnetometer_not_overloaded;
   
   /* flag to track whether power supply outputs were limited or not. Need this flag to be able to set correct errors. */
   int _output_on_limit = 0;
@@ -68,6 +69,8 @@ ss zero_field
     entry {
       ZF_TRANSITION_TO_STATE("initializing");
       %% epicsTimeGetCurrent(&_time_of_last_mag_read_trigger);
+	  %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+	  PVPUT(statemachine_measured_overload_time, 0.0);
     }
     when (){} state trigger_mag_read
   }
@@ -116,6 +119,9 @@ ss zero_field
 
       PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_INVALID);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading became available but severities were invalid.\n", PROGRAM_NAME);
+      /* reset overload counter if invalid */
+      %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+      PVPUT(statemachine_measured_overload_time, 0.0);
     } state wait_before_read
     
     when(delay(read_timeout)) {
@@ -126,6 +132,9 @@ ss zero_field
       PVPUT(status, ZF_STAT_MAGNETOMETER_DATA_STALE);
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading did not become available.\n", PROGRAM_NAME);
       /* After this state go straight to trigger_mag_read rather than wait_before_read as we have already waited 5 seconds */
+      /* reset overload counter if timeout */
+      %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+      PVPUT(statemachine_measured_overload_time, 0.0);
     } state trigger_mag_read
   }
   
@@ -157,14 +166,18 @@ ss zero_field
     }
     
     when(magnetometer_overloaded) {
+      %% epicsTimeStamp new_time;
+      %% epicsTimeGetCurrent(&new_time);
+      PVPUT(statemachine_measured_overload_time, epicsTimeDiffInSeconds(&new_time, &_time_of_last_magnetometer_not_overloaded));
       PVPUT(status, (auto_feedback_enabled ? ZF_STAT_MAGNETOMETER_OVERLOADED_AUTO : ZF_STAT_MAGNETOMETER_OVERLOADED_MANUAL));
       if (debug) {
         errlogSevPrintf(errlogInfo, "%s: Magnetometer overloaded - skipping PSU writes\n", PROGRAM_NAME);
       }
-    } state wait_before_read
+    } state check_auto_feedback
     
     when(!magnetometer_overloaded) {
-      /* Intentionally empty */
+       %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+       PVPUT(statemachine_measured_overload_time, 0.0);
     } state check_auto_feedback
   }
   
@@ -178,8 +191,10 @@ ss zero_field
     } state check_output_psu_state
         
     when(!auto_feedback_enabled) {
-      /* If we get to this point, there is no error. Clear any previous error states. */
-      PVPUT(status, ZF_STAT_NO_ERROR);
+      /* If we get to this point, there is no error other than overload. Clear any previous error states. */
+      if (!magnetometer_overloaded) {
+          PVPUT(status, ZF_STAT_NO_ERROR);
+      }
       if (debug) {
         errlogSevPrintf(errlogMajor, "%s: Auto-feedback disabled - skipping PSU writes\n", PROGRAM_NAME);
       }
@@ -312,19 +327,33 @@ ss zero_field
 		errlogSevPrintf(errlogMajor, "%s: power supply setpoint readbacks are outside limits - cannot write to power supplies.\n", PROGRAM_NAME);
 		PVPUT(status, ZF_STAT_PSU_SP_RBV_OUT_OF_RANGE);	
 	} state wait_before_read
-	
-    when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)) {
+
+    when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar) &&
+          magnetometer_overloaded && statemachine_measured_overload_time <= overload_timeout) {
+           /* Intentionally empty */
+       } state wait_before_read
+
+    when(!psu_limits_inconsistent(pVar) && !psu_sp_rbv_out_of_range(pVar)
+	           && (!magnetometer_overloaded || statemachine_measured_overload_time > overload_timeout)) {
       double new_x = output_psu_x_sp_rbv + ((setpoint_x - magnetometer_x) * amps_per_mg_x * feedback);
       double new_y = output_psu_y_sp_rbv + ((setpoint_y - magnetometer_y) * amps_per_mg_y * feedback);
       double new_z = output_psu_z_sp_rbv + ((setpoint_z - magnetometer_z) * amps_per_mg_z * feedback);
+      double coerced_x, coerced_y, coerced_z;
+	  int x_on_limit, y_on_limit, z_on_limit;
+
+      if (magnetometer_overloaded) {
+          new_x = new_y = new_z = 0.0;
+          errlogSevPrintf(errlogMajor, "%s: magnetometer overloaded for %f seconds, setting PSU X, Y and Z outputs to 0.0\n",
+                     PROGRAM_NAME, statemachine_measured_overload_time);
+      }
       
-      double coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
-      double coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
-      double coerced_z = coerce_to_range(new_z, output_psu_z_sp_drvl, output_psu_z_sp_drvh);
+      coerced_x = coerce_to_range(new_x, output_psu_x_sp_drvl, output_psu_x_sp_drvh);
+      coerced_y = coerce_to_range(new_y, output_psu_y_sp_drvl, output_psu_y_sp_drvh);
+      coerced_z = coerce_to_range(new_z, output_psu_z_sp_drvl, output_psu_z_sp_drvh);
       
-      int x_on_limit = (new_x != coerced_x);
-      int y_on_limit = (new_y != coerced_y);
-      int z_on_limit = (new_z != coerced_z);
+      x_on_limit = (new_x != coerced_x);
+      y_on_limit = (new_y != coerced_y);
+      z_on_limit = (new_z != coerced_z);
       
       if (x_on_limit || y_on_limit || z_on_limit) {
         errlogSevPrintf(errlogMajor, "%s: power supply outputs on limits. Attempted to set (X=%f, Y=%f, Z=%f) but instead set (X=%f, Y=%f, Z=%f)\n", 
