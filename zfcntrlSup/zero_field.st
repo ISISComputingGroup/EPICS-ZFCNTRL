@@ -133,9 +133,9 @@ ss zero_field
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading became available but severities were invalid.\n", PROGRAM_NAME);
       %% epicsTimeGetCurrent(&new_time);
       %% time_taken = 1000.0 * epicsTimeDiffInSeconds(&new_time, &_time_of_last_mag_read_trigger);
-	  PVPUT(statemachine_measured_read_time, time_taken);
+      PVPUT(statemachine_measured_read_time, time_taken);
       /* reset overload counter if invalid */
-	  %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+      %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
       PVPUT(statemachine_measured_overload_time, 0.0);
     } state wait_before_read
 
@@ -148,7 +148,7 @@ ss zero_field
       errlogSevPrintf(errlogMajor, "%s: Magnetometer read error: new reading did not become available.\n", PROGRAM_NAME);
       /* After this state go straight to trigger_mag_read rather than wait_before_read as we have already waited 5 seconds */
       /* reset overload counter if timeout */
-	  %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+      %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
       PVPUT(statemachine_measured_overload_time, 0.0);
     } state trigger_mag_read
   }
@@ -182,8 +182,8 @@ ss zero_field
     
     when(magnetometer_overloaded) {
       %% epicsTimeStamp new_time;
-	  %% epicsTimeGetCurrent(&new_time);
-	  PVPUT(statemachine_measured_overload_time, epicsTimeDiffInSeconds(&new_time, &_time_of_last_magnetometer_not_overloaded));
+      %% epicsTimeGetCurrent(&new_time);
+      PVPUT(statemachine_measured_overload_time, epicsTimeDiffInSeconds(&new_time, &_time_of_last_magnetometer_not_overloaded));
       PVPUT(status, (auto_feedback_enabled ? ZF_STAT_MAGNETOMETER_OVERLOADED_AUTO : ZF_STAT_MAGNETOMETER_OVERLOADED_MANUAL));
       if (debug) {
         errlogSevPrintf(errlogInfo, "%s: Magnetometer overloaded - skipping PSU writes\n", PROGRAM_NAME);
@@ -191,9 +191,8 @@ ss zero_field
     } state check_auto_feedback
 
     when(!magnetometer_overloaded) {
-	  %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+      %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
       PVPUT(statemachine_measured_overload_time, 0.0);
-      /* Intentionally empty */
     } state check_auto_feedback
   }
   
@@ -208,9 +207,9 @@ ss zero_field
         
     when(!auto_feedback_enabled) {
       /* If we get to this point, there is no error other than overload. Clear any previous error states. */
-	  if (!magnetometer_overloaded) {
+      if (!magnetometer_overloaded) {
           PVPUT(status, ZF_STAT_NO_ERROR);
-	  }
+      }
       if (debug) {
         errlogSevPrintf(errlogMajor, "%s: Auto-feedback disabled - skipping PSU writes\n", PROGRAM_NAME);
       }
