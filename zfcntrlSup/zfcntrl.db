@@ -173,7 +173,7 @@ record(ao, "$(P)STATEMACHINE:LOOP_DELAY")
 record(ao, "$(P)STATEMACHINE:OVERLOAD_TIMEOUT")
 {
   field(DESC, "Overload timeout")
-  field(VAL, "600")
+  field(VAL, "180")
   field(PINI, "YES")
   field(PREC, "1")
   field(EGU, "s")
@@ -183,6 +183,7 @@ record(ao, "$(P)STATEMACHINE:OVERLOAD_TIMEOUT")
 record(ai, "$(P)STATEMACHINE:OVERLOAD_TIME")
 {
   field(DESC, "Overload time")
+  field(PREC, "1")
   field(EGU, "s")
 }
 
