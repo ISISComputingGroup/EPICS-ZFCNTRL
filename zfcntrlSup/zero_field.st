@@ -171,7 +171,7 @@ ss zero_field
 	  if (auto_feedback_enabled) {
           PVPUT(statemachine_measured_overload_time, epicsTimeDiffInSeconds(&new_time, &_time_of_last_magnetometer_not_overloaded));
 	  } else {
-	      %% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);
+	      /*%% epicsTimeGetCurrent(&_time_of_last_magnetometer_not_overloaded);*/
           PVPUT(statemachine_measured_overload_time, 0.0); /* zero so can use runcontrol on the value */
 	  }
       PVPUT(status, (auto_feedback_enabled ? ZF_STAT_MAGNETOMETER_OVERLOADED_AUTO : ZF_STAT_MAGNETOMETER_OVERLOADED_MANUAL));
