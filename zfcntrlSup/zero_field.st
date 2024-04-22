@@ -183,7 +183,11 @@ ss zero_field
     when(magnetometer_overloaded) {
       %% epicsTimeStamp new_time;
       %% epicsTimeGetCurrent(&new_time);
-      PVPUT(statemachine_measured_overload_time, epicsTimeDiffInSeconds(&new_time, &_time_of_last_magnetometer_not_overloaded));
+	  if (auto_feedback_enabled) {
+          PVPUT(statemachine_measured_overload_time, epicsTimeDiffInSeconds(&new_time, &_time_of_last_magnetometer_not_overloaded));
+	  } else {
+          PVPUT(statemachine_measured_overload_time, 0.0); /* zero so can use runcontrol on the value */
+	  }
       PVPUT(status, (auto_feedback_enabled ? ZF_STAT_MAGNETOMETER_OVERLOADED_AUTO : ZF_STAT_MAGNETOMETER_OVERLOADED_MANUAL));
       if (debug) {
         errlogSevPrintf(errlogInfo, "%s: Magnetometer overloaded - skipping PSU writes\n", PROGRAM_NAME);
