@@ -10,11 +10,6 @@ PV(int, magnetometer_z_sevr, "{P}FIELD:Z:_RAW.SEVR", Monitor);
 
 /* Magnetometer overload */
 PV(int, magnetometer_overloaded, "{P}MAGNETOMETER:OVERLOAD", Monitor);
-/*
-PV(int, magnetometer_overloaded_x, "{P}MAGNETOMETER:OVERLOAD:X", Monitor);
-PV(int, magnetometer_overloaded_y, "{P}MAGNETOMETER:OVERLOAD:Y", Monitor);
-PV(int, magnetometer_overloaded_z, "{P}MAGNETOMETER:OVERLOAD:Z", Monitor);
-*/
 
 /* Field setpoints */
 PV(double, setpoint_x, "{P}FIELD:X:SP", Monitor);
