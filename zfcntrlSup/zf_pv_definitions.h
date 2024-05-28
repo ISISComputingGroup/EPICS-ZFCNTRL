@@ -32,6 +32,11 @@ PV(int, output_psu_x_sp_sevr, "{P}OUTPUT:X:CURR:SP.SEVR", Monitor);
 PV(int, output_psu_y_sp_sevr, "{P}OUTPUT:Y:CURR:SP.SEVR", Monitor);
 PV(int, output_psu_z_sp_sevr, "{P}OUTPUT:Z:CURR:SP.SEVR", Monitor);
 
+/* whether to send new current setpoints */
+PV(int, update_psu_x_sp, "{P}OUTPUT:X:CURR:UPDATE:SP", Monitor);
+PV(int, update_psu_y_sp, "{P}OUTPUT:Y:CURR:UPDATE:SP", Monitor);
+PV(int, update_psu_z_sp, "{P}OUTPUT:Z:CURR:UPDATE:SP", Monitor);
+
 /* Power supply voltage setpoints */
 PV(double, output_psu_x_volt_sp, "{P}OUTPUT:X:VOLT:SP", NoMon);
 PV(double, output_psu_y_volt_sp, "{P}OUTPUT:Y:VOLT:SP", NoMon);
@@ -105,15 +110,18 @@ PV(double, volt_limit_tolerance, "{P}VOLT_LIMIT_TOLERANCE", Monitor);
 
 /* Statuses for feedback to OPI etc */
 PV(string, statemachine_state, "{P}STATEMACHINE:STATE", NoMon);
-PV(int, statemachine_activity, "{P}STATEMACHINE:ACTIVITY", Monitor);
+PV(int, statemachine_activity, "{P}STATEMACHINE:ACTIVITY", NoMon);
 PV(double, statemachine_measured_loop_time, "{P}STATEMACHINE:LOOP_TIME", NoMon); /* msec */
+PV(double, statemachine_measured_read_time, "{P}STATEMACHINE:READ_TIME", NoMon); /* msec */
+PV(double, statemachine_measured_write_time, "{P}STATEMACHINE:WRITE_TIME", NoMon); /* msec */
+PV(double, statemachine_measured_check_time, "{P}STATEMACHINE:CHECK_TIME", NoMon); /* msec */
 PV(double, statemachine_measured_overload_time, "{P}STATEMACHINE:OVERLOAD_TIME", NoMon); /* sec */
 PV(double, loop_delay, "{P}STATEMACHINE:LOOP_DELAY", Monitor); /* msec */
 PV(double, read_timeout, "{P}STATEMACHINE:READ_TIMEOUT", Monitor); /* sec */
 PV(double, overload_timeout, "{P}STATEMACHINE:OVERLOAD_TIMEOUT", Monitor); /* sec */
 
 PV(int, status, "{P}STATUS", NoMon);
-PV(int, at_setpoint, "{P}AT_SETPOINT", Monitor);
+PV(int, at_setpoint, "{P}AT_SETPOINT", NoMon);
 
 /* Whether new readings are available from the magnetometer */
 PV(int, new_readings_available, "{P}_READINGS_READY", Monitor);
